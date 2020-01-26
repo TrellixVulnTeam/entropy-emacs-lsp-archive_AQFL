@@ -1,0 +1,8 @@
+..\wrapt\__init__.py
+..\wrapt\decorators.py
+..\wrapt\importer.py
+..\wrapt\wrappers.py
+PKG-INFO
+SOURCES.txt
+dependency_links.txt
+top_level.txt

@@ -1,0 +1,6 @@
+;; -*- mode: emacs-lisp; -*-
+
+(npm-lspa
+ :root "npm"
+ :prebuilt ((all :init "eemacs-lspa-npm-prebuilt-all-load.el"))
+ :archive nil)

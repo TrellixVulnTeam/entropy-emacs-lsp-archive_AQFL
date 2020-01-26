@@ -1,0 +1,12 @@
+;; -*- mode: emacs-lisp; -*-
+
+(pypi-lspa
+ :root "pypi"
+ :prebuilt ((gnu/linux
+             (x86_64 :init "eemacs-lspa-pypi-prebuilt-gnulinux-x86_64-load.el")
+             (aarch64 :init "eemacs-lspa-pypi-prebuilt-gnulinux-aarch64-load.el"))
+            (windows-nt
+             (x86_64 :init "eemacs-lspa-pypi-prebuilt-windowsnt-x86_64-load.el")))
+ :archive nil
+ ;; :archive ((all :init "eemacs-lspa-pypi-archive-all-load.el"))
+ )

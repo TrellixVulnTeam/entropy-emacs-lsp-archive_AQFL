@@ -1,0 +1,3 @@
+Due python package source dowloading is depending on platform thus can
+not easily archive the sources for all platform for this folder
+designation.
