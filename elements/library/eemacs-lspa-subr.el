@@ -2,6 +2,13 @@
 ;; ** requirements
 (require 'cl-lib)
 
+(defvar eemacs-lspa/subr-loader-indicator nil)
+
+(defun eemacs-lspa/subr-noninteractive ()
+  (if eemacs-lspa/subr-loader-indicator
+      nil
+    noninteractive))
+
 ;; ** common library
 ;; *** dir and file operation
 ;; **** list directory
@@ -151,7 +158,7 @@ type:
      &key ((:make-body make-body)) ((:load-body load-body))
      &allow-other-keys)
   `(let ()
-     (if noninteractive
+     (if (eemacs-lspa/subr-noninteractive)
          (progn
            (message "")
            (message

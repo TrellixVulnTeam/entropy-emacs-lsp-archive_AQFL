@@ -281,7 +281,7 @@
 please check variable `eemacs-lspa/project-loaders-missing'"))
   (dolist (loader eemacs-lspa/project-loaders-obtained)
     (load loader))
-  (when noninteractive
+  (when (eemacs-lspa/subr-noninteractive)
     (with-current-buffer
         (find-file-noselect
          (expand-file-name "init" eemacs-lspa/project-root))

@@ -20,12 +20,12 @@
 
 ;; copy orig execs to callers folder
 (cond ((and (file-exists-p eemacs-lspa/pypi-gnulinux_aarch64-caller-root)
-         noninteractive)
+         (eemacs-lspa/subr-noninteractive))
        (delete-directory eemacs-lspa/pypi-gnulinux_aarch64-caller-root t)
        (copy-directory eemacs-lspa/pypi-gnulinux_aarch64-orig-exec-root
                        eemacs-lspa/pypi-gnulinux_aarch64-caller-root))
       ((and (not (file-exists-p eemacs-lspa/pypi-gnulinux_aarch64-caller-root))
-            noninteractive)
+            (eemacs-lspa/subr-noninteractive))
        (copy-directory eemacs-lspa/pypi-gnulinux_aarch64-orig-exec-root
                        eemacs-lspa/pypi-gnulinux_aarch64-caller-root)))
 
