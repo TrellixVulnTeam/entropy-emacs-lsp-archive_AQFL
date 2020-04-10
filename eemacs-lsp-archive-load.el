@@ -403,7 +403,7 @@
 (defvar eemacs-lspa/project-loaders-missing nil)
 
 
-(let ((exec-requests '("pip" "npm" "cp" "rm" "mv"))
+(let ((exec-requests '("pip" "npm" "bash"))
       (cnt 0))
   (dolist (exec exec-requests)
     (unless (executable-find exec)
