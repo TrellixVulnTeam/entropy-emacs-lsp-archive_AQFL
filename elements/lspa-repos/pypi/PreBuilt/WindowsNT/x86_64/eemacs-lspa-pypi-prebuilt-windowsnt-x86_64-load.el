@@ -64,7 +64,7 @@
        (expand-file-name item)
        (expand-file-name eemacs-lspa/pypi-win64-wheels-root)))))
 
-(eemacs-lspa/subr-common-print
+(eemacs-lspa/subr-common-do-with-prompt
  "Generating win64 pypi callers"
  "Loading win64 pypi lsp archive"
  :make-body

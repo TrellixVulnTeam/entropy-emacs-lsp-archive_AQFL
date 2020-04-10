@@ -13,7 +13,7 @@
    ".bin"
    eemacs-lspa/npm-all-modules-root))
 
-(eemacs-lspa/subr-common-print
+(eemacs-lspa/subr-common-do-with-prompt
  "Init npm-prebuilt-all lsp archive"
  "Loading eemacs-lspa npm branch"
  :load-body

@@ -2,5 +2,7 @@
 
 (npm-lspa
  :root "npm"
- :prebuilt ((all :init "eemacs-lspa-npm-prebuilt-all-load.el"))
- :archive nil)
+ :prebuilt
+ ((all :init "eemacs-lspa-npm-prebuilt-all-load.el"))
+ :archive
+ ((all :init "eemacs-lspa-npm-archive-all-load.el")))

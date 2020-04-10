@@ -7,6 +7,5 @@
              (aarch64 :init "eemacs-lspa-pypi-prebuilt-gnulinux-aarch64-load.el"))
             (windows-nt
              (x86_64 :init "eemacs-lspa-pypi-prebuilt-windowsnt-x86_64-load.el")))
- :archive nil
- ;; :archive ((all :init "eemacs-lspa-pypi-archive-all-load.el"))
+ :archive ((all :init "eemacs-lspa-pypi-archive-all-load.el"))
  )

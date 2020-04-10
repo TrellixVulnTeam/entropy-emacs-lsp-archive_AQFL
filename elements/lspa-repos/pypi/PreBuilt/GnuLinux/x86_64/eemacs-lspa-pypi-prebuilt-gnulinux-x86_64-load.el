@@ -51,7 +51,7 @@
        (expand-file-name
         eemacs-lspa/pypi-gnulinuxx64-lib-root)))))
 
-(eemacs-lspa/subr-common-print
+(eemacs-lspa/subr-common-do-with-prompt
  "Paching gnulinux x64 pypi lsp archive"
  "Loading gnulinux x64 pypi lsp archive"
  :make-body

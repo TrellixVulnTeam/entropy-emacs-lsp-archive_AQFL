@@ -4,10 +4,23 @@
 
 (defvar eemacs-lspa/subr-loader-indicator nil)
 
+(defvar eemacs-lspa/subr--print-count 1)
+
 (defun eemacs-lspa/subr-noninteractive ()
   (if eemacs-lspa/subr-loader-indicator
       nil
     noninteractive))
+
+(defvar eemacs-lspa/subr-root-dir
+  (file-name-directory
+   (expand-file-name load-file-name)))
+
+(defvar eemacs-lspa/subr-shell-batch-file
+  (expand-file-name "eemacs-lspa-install.sh"
+                    eemacs-lspa/subr-root-dir))
+
+(when (file-exists-p eemacs-lspa/subr-shell-batch-file)
+  (delete-file eemacs-lspa/subr-shell-batch-file))
 
 ;; ** common library
 ;; *** dir and file operation
@@ -101,16 +114,16 @@ directory."
   "The file-path for 'entropy-emacs, functions for get base-name,
 shrink trail slash, and return the parent(up level) dir.
 
-type: 
+type:
 
 - 'non-trail-slash':
-  
+
   Shrink the FILE-NAME path trail slash and return it.
 
 - 'file-name':
 
   Return the file base name include its suffix type.
-  
+
 - 'parent-dir':
 
   Return its parent directory path using `file-name-directory'"
@@ -150,9 +163,7 @@ type:
 
 ;; *** procedure message wrapper
 
-(defvar eemacs-lspa/subr--print-count 1)
-
-(cl-defmacro eemacs-lspa/subr-common-print
+(cl-defmacro eemacs-lspa/subr-common-do-with-prompt
     (message-make
      message-load
      &key ((:make-body make-body)) ((:load-body load-body))
@@ -176,6 +187,31 @@ type:
        (message ""))
      (cl-incf eemacs-lspa/subr--print-count)))
 
+;; *** Add shell batch
+
+(defun eemacs-lspa/subr-add-batch-file (item-prompt cmd)
+  (with-current-buffer
+      (find-file-noselect eemacs-lspa/subr-shell-batch-file)
+    (let* ((inhibit-read-only t)
+           (head-fmstr
+            "
+echo \"\"
+echo \"==============================\"
+echo \"[%s]: %s\"
+echo \"==============================\"
+"
+            ))
+      (goto-char (point-max))
+      (newline)
+      (insert
+       (format head-fmstr "Bootstrap"
+               item-prompt))
+      (newline)
+      (insert cmd)
+      (newline))
+    (save-buffer)
+    (kill-buffer)))
+
 ;; ** lsp callers refactory
 ;; *** pypi
 ;; **** patch python installed bins for import portable "sys.path"
@@ -190,7 +226,7 @@ type:
           (inst-new nil))
       (goto-char (point-min))
       (unless (re-search-forward inst-entry-regexp nil t)
-        (setq inst-new))
+        (setq inst-new t))
       (if inst-new
           (progn
             (goto-char (point-min))
