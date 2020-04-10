@@ -20,3 +20,4 @@ all:
 	@git clean -xfd .
 	@$(DOIT)
 	@$(value DoExtra)
+	@touch init

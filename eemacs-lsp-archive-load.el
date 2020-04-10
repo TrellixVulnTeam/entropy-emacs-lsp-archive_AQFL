@@ -277,15 +277,54 @@
 ;; **** optional env condition detected
 
 (defvar eemacs-lspa/project-force-use-archive nil)
-
+(defvar eemacs-lspa/project-use-specific-architecture nil)
+(defvar eemacs-lspa/project-use-specific-platform nil)
 (defun eemacs-lspa/project-catch-env-var (type)
   (cl-case type
-    (force-use-archive-p (or (string= (getenv "Eemacs_Lspa_Use_Archive") "t")
-                             eemacs-lspa/project-force-use-archive))
+    (force-use-archive-p
+     (or (string= (getenv "Eemacs_Lspa_Use_Archive") "t")
+         eemacs-lspa/project-force-use-archive))
+    (use-arch
+     (or (getenv "Eemacs_Lspa_Use_Architecture")
+         eemacs-lspa/project-use-specific-architecture))
+    (use-platform
+     (or (ignore-errors (intern (getenv "Eemacs_Lspa_Use_Platform")))
+         eemacs-lspa/project-use-specific-platform
+         system-type))
     (t
      (error "Unsupport type '%s'" type))))
 
 ;; *** main
+
+(defun eemacs-lspa/project-get-current-system-architecture (system-platform)
+  (or (eemacs-lspa/project-catch-env-var 'use-arch)
+      (let ((cur-platform system-platform))
+        (cond
+         ((eq cur-platform 'window-nt)
+          (let ((sysinfo))
+            (setq sysinfo
+                  (car (split-string
+                        (nth 1
+                             (split-string
+                              (shell-command-to-string
+                               "systeminfo | findstr /R \"System.Type\"")
+                              ":" t))
+                        " " t)))
+            (car (alist-get sysinfo eemacs-lspa/project-arch-alias))))
+         (t
+          (intern (replace-regexp-in-string
+                   "\n" ""
+                   (shell-command-to-string "uname -m"))))))))
+
+(defvar eemacs-lspa/project--current-make-prefix nil)
+(defun eemacs-lspa/project-echo-make-prefix ()
+  (let ((info eemacs-lspa/project--current-make-prefix))
+    (message "")
+    (message "Use-platform:     %s" (plist-get info :cur-platform))
+    (message "Use-architecture: %s" (plist-get info :cur-architecture))
+    (message "Use-archive-type: %s" (plist-get info :cur-archive-use-type))
+    (message "")))
+
 (defun eemacs-lspa/project-query-register (lspa-register)
   "return the loader or nil for unsupport various"
   (let* ((name (car lspa-register))
@@ -294,24 +333,17 @@
                                           eemacs-lspa/path-lspa-repos-root))
          (prebuilt-obj (plist-get register-tree :prebuilt))
          (archive-obj (plist-get register-tree :archive))
-         (cur-platform system-type)
+         (cur-platform (eemacs-lspa/project-catch-env-var 'use-platform))
          (cur-arch
-          (cond
-           ((eq cur-platform 'window-nt)
-            (let ((sysinfo))
-              (setq sysinfo
-                    (car (split-string
-                          (nth 1
-                               (split-string
-                                (shell-command-to-string
-                                 "systeminfo | findstr /R \"System.Type\"")
-                                ":" t))
-                          " " t)))
-              (car (alist-get sysinfo eemacs-lspa/project-arch-alias))))
-           (t
-            (intern (replace-regexp-in-string
-                     "\n" ""
-                     (shell-command-to-string "uname -m")))))))
+          (eemacs-lspa/project-get-current-system-architecture cur-platform)))
+
+    (setq eemacs-lspa/project--current-make-prefix
+          (plist-put eemacs-lspa/project--current-make-prefix
+                     :cur-platform cur-platform))
+    (setq eemacs-lspa/project--current-make-prefix
+          (plist-put eemacs-lspa/project--current-make-prefix
+                     :cur-architecture cur-arch))
+
     (let* (builtin-support
            archive-support
            (reg-prebuilt-all (alist-get 'all prebuilt-obj))
@@ -347,9 +379,21 @@
           (setq archive-support (eemacs-lspa/project-expand-loader-for-archive-individual
                                  register-root cur-platform cur-arch
                                  (plist-get reg-archive-platform-arch :init)))))
-      (if (eemacs-lspa/project-catch-env-var 'force-use-archive-p)
-          archive-support
-        (or builtin-support archive-support)))))
+      (cond ((eemacs-lspa/project-catch-env-var 'force-use-archive-p)
+             (setq eemacs-lspa/project--current-make-prefix
+                   (plist-put eemacs-lspa/project--current-make-prefix
+                              :cur-archive-use-type "Archive"))
+             archive-support)
+            (builtin-support
+             (setq eemacs-lspa/project--current-make-prefix
+                   (plist-put eemacs-lspa/project--current-make-prefix
+                              :cur-archive-use-type "Prebuilt"))
+             builtin-support)
+            (archive-support
+             (setq eemacs-lspa/project--current-make-prefix
+                   (plist-put eemacs-lspa/project--current-make-prefix
+                              :cur-archive-use-type "Archive"))
+             archive-support)))))
 
 
 ;; * provide
@@ -364,6 +408,7 @@
     (when (and (not (ignore-errors (file-exists-p loader)))
                (not (null loader)))
       (add-to-list 'eemacs-lspa/project-loaders-missing loader)))
+  (eemacs-lspa/project-echo-make-prefix)
   (when eemacs-lspa/project-loaders-missing
     (message
      "eemacs lspa registed loader missing,
@@ -374,15 +419,7 @@ please check variable `eemacs-lspa/project-loaders-missing'
     (error "Mission corrupt!"))
   (cond ((not (null eemacs-lspa/project-loaders-obtained))
          (dolist (loader eemacs-lspa/project-loaders-obtained)
-           (load loader))
-         (when (eemacs-lspa/subr-noninteractive)
-           (with-current-buffer
-               (find-file-noselect
-                (expand-file-name "init" eemacs-lspa/project-root))
-             (let ((inhibit-read-only t))
-               (erase-buffer)
-               (save-buffer)
-               (kill-buffer)))))
+           (load loader)))
         ((null eemacs-lspa/project-loaders-obtained)
          (message "There's no available lspa for current architecture '%s'"
                   system-type))))

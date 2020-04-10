@@ -76,11 +76,8 @@
     (eemacs-lspa/pypi-win64-gen-cmds)
     (eemacs-lspa/pypi-win64-patch-py-bins)))
  :load-body
- ((setenv "PATH"
-          (concat (getenv "PATH")
-                  ";"
-                  (expand-file-name eemacs-lspa/pypi-win64-callers-root)))
-  (add-to-list 'exec-path
-               (expand-file-name eemacs-lspa/pypi-win64-callers-root))))
+ ((eemacs-lspa/subr-add-path
+   eemacs-lspa/pypi-win64-callers-root nil
+   eemacs-lspa/pypi-win64-callers-root nil)))
 
 (provide 'eemacs-lspa-pypi-prebuilt-windowsnt-x86_64-load)
