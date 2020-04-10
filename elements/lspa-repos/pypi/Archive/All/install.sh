@@ -11,6 +11,8 @@ eemacs_lspa_pypi_srcdir="$( cd -P "$( dirname "$eemacs_lspa_pypi_src" )" >/dev/n
 
 cd $eemacs_lspa_pypi_srcdir
 
+set -e
+
 [[ ! -d wheels ]] && mkdir wheels
 cd wheels/
 

@@ -221,9 +221,7 @@
     (gnu "GnuHurd")
     (gnu/kfreebsd "GnuKfreebsd")
     (darwin "Darwin")
-    (ms-dos "MsDos")
-    (windows-nt "WindowsNT")
-    (cygwin "Cygwin")))
+    (windows-nt "WindowsNT")))
 
 ;; *** register entries
 (defvar eemacs-lspa/project-lspa-summary
@@ -274,28 +272,7 @@
      "Archive" (expand-file-name elroot)))))
 
 
-;; **** optional env condition detected
-
-(defvar eemacs-lspa/project-force-use-archive nil)
-(defvar eemacs-lspa/project-use-specific-architecture nil)
-(defvar eemacs-lspa/project-use-specific-platform nil)
-(defun eemacs-lspa/project-catch-env-var (type)
-  (cl-case type
-    (force-use-archive-p
-     (or (string= (getenv "Eemacs_Lspa_Use_Archive") "t")
-         eemacs-lspa/project-force-use-archive))
-    (use-arch
-     (or (getenv "Eemacs_Lspa_Use_Architecture")
-         eemacs-lspa/project-use-specific-architecture))
-    (use-platform
-     (or (ignore-errors (intern (getenv "Eemacs_Lspa_Use_Platform")))
-         eemacs-lspa/project-use-specific-platform
-         system-type))
-    (t
-     (error "Unsupport type '%s'" type))))
-
-;; *** main
-
+;; **** get system architecture
 (defun eemacs-lspa/project-get-current-system-architecture (system-platform)
   (or (eemacs-lspa/project-catch-env-var 'use-arch)
       (let ((cur-platform system-platform))
@@ -315,7 +292,7 @@
           (intern (replace-regexp-in-string
                    "\n" ""
                    (shell-command-to-string "uname -m"))))))))
-
+;; **** echo prompt
 (defvar eemacs-lspa/project--current-make-prefix nil)
 (defun eemacs-lspa/project-echo-make-prefix ()
   (let ((info eemacs-lspa/project--current-make-prefix))
@@ -324,6 +301,31 @@
     (message "Use-architecture: %s" (plist-get info :cur-architecture))
     (message "Use-archive-type: %s" (plist-get info :cur-archive-use-type))
     (message "")))
+
+;; **** optional env condition detected
+
+(defvar eemacs-lspa/project-force-use-archive nil)
+(defvar eemacs-lspa/project-use-specific-architecture nil)
+(defvar eemacs-lspa/project-use-specific-platform nil)
+(defun eemacs-lspa/project-catch-env-var (type)
+  (cl-case type
+    (force-use-archive-p
+     (or (string= (getenv "Eemacs_Lspa_Use_Archive") "t")
+         eemacs-lspa/project-force-use-archive))
+    (use-arch
+     (or (getenv "Eemacs_Lspa_Use_Architecture")
+         eemacs-lspa/project-use-specific-architecture))
+    (use-platform
+     (or (ignore-errors (intern (getenv "Eemacs_Lspa_Use_Platform")))
+         eemacs-lspa/project-use-specific-platform
+         (cond ((eq system-type 'cygwin)
+                'windows-nt)
+               (t
+                system-type))))
+    (t
+     (error "Unsupport type '%s'" type))))
+
+;; *** main
 
 (defun eemacs-lspa/project-query-register (lspa-register)
   "return the loader or nil for unsupport various"
@@ -399,6 +401,17 @@
 ;; * provide
 (defvar eemacs-lspa/project-loaders-obtained nil)
 (defvar eemacs-lspa/project-loaders-missing nil)
+
+
+(let ((exec-requests '("pip" "npm" "cp" "rm" "mv"))
+      (cnt 0))
+  (dolist (exec exec-requests)
+    (unless (executable-find exec)
+      (progn
+        (cl-incf cnt)
+        (message "[%s]: missing exec '%s'" cnt exec))))
+  (when (> cnt 0)
+    (error "Please install above missing binaries. Abort!")))
 
 (let (rtn)
   (dolist (item eemacs-lspa/project-lspa-summary)
