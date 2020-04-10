@@ -16,7 +16,11 @@
   (mkdir eemacs-lspa/pypi-win64-callers-root t))
 
 (defvar eemacs-lspa/pypi-win64-bin-path
-  (expand-file-name "bin"
+  (expand-file-name "Scripts"
+                    eemacs-lspa/pypi-win64-wheels-root))
+
+(defvar eemacs-lspa/pypi-win64-lib-path
+  (expand-file-name "Lib/site-packages"
                     eemacs-lspa/pypi-win64-wheels-root))
 
 (defun eemacs-lspa/pypi-win64-get-exe-bins ()
@@ -54,7 +58,7 @@
         (eemacs-lspa/subr-pypi-gen-python-w32-cmd-bin
          w32cmd
          (expand-file-name w32bin)
-         (expand-file-name eemacs-lspa/pypi-win64-wheels-root))))))
+         (expand-file-name eemacs-lspa/pypi-win64-lib-path))))))
 
 
 (defun eemacs-lspa/pypi-win64-patch-py-bins ()
@@ -62,7 +66,7 @@
     (dolist (item pyfiles)
       (eemacs-lspa/subr-pypi-patch-python-bin-for-pythonpath
        (expand-file-name item)
-       (expand-file-name eemacs-lspa/pypi-win64-wheels-root)))))
+       (expand-file-name eemacs-lspa/pypi-win64-lib-path)))))
 
 (eemacs-lspa/subr-common-do-with-prompt
  "Generating win64 pypi callers"
