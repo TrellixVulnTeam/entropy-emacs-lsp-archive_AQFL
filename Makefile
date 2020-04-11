@@ -85,7 +85,7 @@ all:
 else
 all:
 	@echo Make on $(detected_OS) ...
-	@echo \n
+	@echo
 	@git clean -xfd .
 	@$(DOIT)
 	@$(value DoExtra)
