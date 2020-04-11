@@ -221,7 +221,8 @@
     (gnu "GnuHurd")
     (gnu/kfreebsd "GnuKfreebsd")
     (darwin "Darwin")
-    (windows-nt "WindowsNT")))
+    (windows-nt "WindowsNT")
+    (cygwin "cygwin")))
 
 ;; *** register entries
 (defvar eemacs-lspa/project-lspa-summary
@@ -292,6 +293,7 @@
           (intern (replace-regexp-in-string
                    "\n" ""
                    (shell-command-to-string "uname -m"))))))))
+
 ;; **** echo prompt
 (defvar eemacs-lspa/project--current-make-prefix nil)
 (defun eemacs-lspa/project-echo-make-prefix ()
@@ -318,10 +320,7 @@
     (use-platform
      (or (ignore-errors (intern (getenv "Eemacs_Lspa_Use_Platform")))
          eemacs-lspa/project-use-specific-platform
-         (cond ((eq system-type 'cygwin)
-                'windows-nt)
-               (t
-                system-type))))
+         system-type))
     (t
      (error "Unsupport type '%s'" type))))
 
