@@ -36,6 +36,7 @@
    "Installing all pypi packages"
    (format
     "
+set -e
 bash %s
 "
     eemacs-lspa/pypi-archive-all-install-sh-file))))

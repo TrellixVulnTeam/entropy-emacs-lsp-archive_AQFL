@@ -30,6 +30,7 @@
    "Installing all node packages"
    (format
     "
+set -e
 bash %s
 "
     eemacs-lspa/npm-archive-all-install-sh-file))))
