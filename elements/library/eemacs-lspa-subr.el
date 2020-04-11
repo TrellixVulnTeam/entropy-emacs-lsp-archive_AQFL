@@ -199,6 +199,14 @@ echo [%s]: %s
 echo ==============================
 "
             ))
+      (when (eq system-type 'windows-nt)
+        (goto-char (point-min))
+        (let ((echo-off-not-inserted nil))
+          (save-excursion
+            (unless (re-search-forward "^@echo off" nil t)
+              (setq echo-off-not-inserted t)))
+          (when echo-off-not-inserted
+            (insert "@echo off\n"))))
       (goto-char (point-max))
       (newline)
       (insert
