@@ -59,7 +59,7 @@ endif
 
 ifeq ($(detected_OS),Windows)
 define DoExtra =
-	if exist elements/library/eemacs-lspa-install.cmd (cd elements/library && call eemacs-lspa-install.cmd)
+	cmd /c if exist elements/library/eemacs-lspa-install.cmd (call elements/library/eemacs-lspa-install.cmd)
 endef
 endif
 
