@@ -20,9 +20,6 @@
                             (if (eq system-type 'windows-nt) "cmd" "sh"))
                     eemacs-lspa/subr-root-dir))
 
-(when (file-exists-p eemacs-lspa/subr-shell-batch-file)
-  (delete-file eemacs-lspa/subr-shell-batch-file))
-
 ;; ** common library
 ;; *** dir and file operation
 ;; **** list directory
