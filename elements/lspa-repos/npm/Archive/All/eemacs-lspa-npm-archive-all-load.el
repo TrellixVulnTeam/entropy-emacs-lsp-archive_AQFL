@@ -18,6 +18,11 @@
    "install.sh"
    eemacs-lspa/npm-archive-all-loader-root))
 
+(defvar eemacs-lspa/npm-archive-all-install-cmd-file
+  (expand-file-name
+   "install.cmd"
+   eemacs-lspa/npm-archive-all-loader-root))
+
 (eemacs-lspa/subr-common-do-with-prompt
  "Init npm-archive-all lsp archive"
  "Loading eemacs-lspa npm branch"
@@ -28,11 +33,17 @@
  :make-body
  ((eemacs-lspa/subr-add-batch-file
    "Installing all node packages"
-   (format
-    "
+   (if (eq system-type 'windows-nt)
+       (format
+        "
+call %s
+"
+        eemacs-lspa/npm-archive-all-install-cmd-file)
+     (format
+      "
 set -e
 bash %s
 "
-    eemacs-lspa/npm-archive-all-install-sh-file))))
+      eemacs-lspa/npm-archive-all-install-sh-file)))))
 
 (provide 'eemacs-lspa-npm-prebuilt-all-load)

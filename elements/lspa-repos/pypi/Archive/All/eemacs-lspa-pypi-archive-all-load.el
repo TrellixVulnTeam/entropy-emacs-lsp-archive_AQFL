@@ -24,6 +24,11 @@
    "install.sh"
    eemacs-lspa/pypi-archive-all-loader-root))
 
+(defvar eemacs-lspa/pypi-archive-all-install-cmd-file
+  (expand-file-name
+   "install.cmd"
+   eemacs-lspa/pypi-archive-all-loader-root))
+
 (eemacs-lspa/subr-common-do-with-prompt
  "Init pypi-archive-all lsp archive"
  "Loading eemacs-lspa pypi branch"
@@ -34,11 +39,17 @@
  :make-body
  ((eemacs-lspa/subr-add-batch-file
    "Installing all pypi packages"
-   (format
-    "
+   (if (eq system-type 'windows-nt)
+       (format
+        "
+call %s
+"
+        eemacs-lspa/pypi-archive-all-install-cmd-file)
+     (format
+      "
 set -e
 bash %s
 "
-    eemacs-lspa/pypi-archive-all-install-sh-file))))
+      eemacs-lspa/pypi-archive-all-install-sh-file)))))
 
 (provide 'eemacs-lspa-npm-prebuilt-all-load)

@@ -16,7 +16,8 @@
    (expand-file-name load-file-name)))
 
 (defvar eemacs-lspa/subr-shell-batch-file
-  (expand-file-name "eemacs-lspa-install.sh"
+  (expand-file-name (format "eemacs-lspa-install.%s"
+                            (if (eq system-type 'windows-nt) "cmd" "sh"))
                     eemacs-lspa/subr-root-dir))
 
 (when (file-exists-p eemacs-lspa/subr-shell-batch-file)
@@ -195,10 +196,10 @@ type:
     (let* ((inhibit-read-only t)
            (head-fmstr
             "
-echo \"\"
-echo \"==============================\"
-echo \"[%s]: %s\"
-echo \"==============================\"
+echo
+echo ==============================
+echo [%s]: %s
+echo ==============================
 "
             ))
       (goto-char (point-max))
