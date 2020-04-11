@@ -65,15 +65,17 @@ endif
 
 # ** rules
 help:
-	@echo "============================================================"
-	@echo "  welcom to entropy emacs language server archive project"
-	@echo "============================================================"
-	@echo ""
-	@echo "MAKE options:"
-	@echo ""
-	@echo "- help: show this prompt buffer"
-	@echo ""
-	@echo "- all: generate language server executes according to current platform"
+	@echo ------------------------------------------------------------
+	@echo   welcom to entropy emacs language server archive project
+	@echo ------------------------------------------------------------
+	@echo
+	@echo This project require GNU/Make version larger than 4.0, if not, will messing your result
+	@echo
+	@echo MAKE options:
+	@echo
+	@echo - help: show this prompt buffer
+	@echo
+	@echo - all: generate language server executes according to current platform
 
 
 ifeq ($(detected_OS),Unknown)
@@ -83,7 +85,7 @@ all:
 else
 all:
 	@echo Make on $(detected_OS) ...
-	@echo ""
+	@echo \n
 	@git clean -xfd .
 	@$(DOIT)
 	@$(value DoExtra)
