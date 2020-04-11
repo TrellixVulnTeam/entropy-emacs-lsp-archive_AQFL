@@ -14,6 +14,7 @@ rmdir /s /q bin
 pip install python-language-server[all] --prefix .\
 
 move Lib\site-packages .\lib-tmp
+rmdir /s /q Lib
 ren lib-tmp lib
 ren Scripts bin
 
