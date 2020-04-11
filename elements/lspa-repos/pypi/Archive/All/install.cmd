@@ -6,10 +6,10 @@ IF NOT EXIST "wheels" ( md wheels )
 
 cd wheels
 
-rmdir /s /q Lib
-rmdir /s /q lib
-rmdir /s /q Scripts
-rmdir /s /q bin
+IF EXIST "Lib\" ( rmdir /s /q Lib )
+IF EXIST "lib\" ( rmdir /s /q lib )
+IF EXIST "Scripts\" ( rmdir /s /q Scripts )
+IF EXIST "bin\" ( rmdir /s /q bin )
 
 pip install python-language-server[all] --prefix .\
 
