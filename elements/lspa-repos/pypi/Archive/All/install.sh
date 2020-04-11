@@ -21,7 +21,7 @@ cd wheels/
 [[ -d Script ]] && rm -rf Scripts
 [[ -d bin ]] && rm -rf bin
 
-pip install python-language-server[all] grip --prefix ./
+pip install python-language-server[all] grip --prefix $(pwd)
 
 [[ -d Lib ]] && mv -v Lib lib
 [[ -d Script ]] && mv -v Script bin
