@@ -1,20 +1,20 @@
-Note: this file is auto converted from lisp-toggle-file.[20200409091106].el by [el2org](https://github.com/tumashu/el2org), please do not edit it by hand!!!
+Note: this file is auto converted from lisp-toggle-file.[20200412090812].el by [el2org](https://github.com/tumashu/el2org), please do not edit it by hand!!!
 
-- [eemacs lsp archive project](#org80c7a46)
-- [Copyright (C) date  author](#org6ecadbd)
-- [Commentary:](#org9404b99)
+- [eemacs lsp archive project](#org61772f5)
+- [Copyright (C) date  author](#orgb930235)
+- [Commentary:](#h-b5013db2-37a9-44de-9327-05b17e760dbc)
   - [Contribute](#h-8c8344df-e341-4183-9e06-cec26bd8bb43)
     - [`lspa-register` sub-folder naming convention](#h-58d05c1a-62a2-44c4-be4f-1de662fe190b)
     - [Make and load prior](#h-7f5311d9-9ff0-4cb4-96f0-8775fd135246)
     - [Recipes](#h-8960a582-196b-44d4-ad49-bbf74cc943d6)
 
 
-<a id="org80c7a46"></a>
+<a id="org61772f5"></a>
 
 # eemacs lsp archive project
 
 
-<a id="org6ecadbd"></a>
+<a id="orgb930235"></a>
 
 # Copyright (C) date  author
 
@@ -39,7 +39,7 @@ Note: this file is auto converted from lisp-toggle-file.[20200409091106].el by [
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-<a id="org9404b99"></a>
+<a id="h-b5013db2-37a9-44de-9327-05b17e760dbc"></a>
 
 # Commentary:
 
@@ -58,6 +58,24 @@ The project was designed as the extension for GNU/emacs above(and include) for 2
 ```
 
 Or add to this project root to your `load-path` and `require` it or using config loader management like `use-package` to deferred load the feature `eemacs-lsp-archive-load`.
+
+**Environment variables:**
+
+We made the make procedure can be specified for particular platform and architecture even for the archive using type, for testing or other special meanings. The following three environment variables were builtin for the sake of thus:
+
+1.  `Eemacs_Lspa_Use_Archive`:
+
+    The environment variable for indicate whether focely using archive type.
+
+    Valid value are: 't' or 'nil'
+
+2.  `Eemacs_Lspa_Use_Platform`:
+
+    The environment variable for indicating which system platform to use, valid values are all of them can be getted by emacs internal variable `system-type`.
+
+3.  `Eemacs_Lspa_Use_Architecture`
+
+    The environment variable for indicating which architecture to use, valid values are 'x86<sub>64</sub>' and 'aarch64'.
 
 
 <a id="h-8c8344df-e341-4183-9e06-cec26bd8bb43"></a>
@@ -147,4 +165,4 @@ Thus for a expample, we made a python-language-server `lspa-register` recipe ins
 As see the sample, we use the abbreviation path for the archvie root, which will be automatically expanding with `eemacs-lspa/path-lspa-repos-root`.
 
 
-<a id="org741ac27"></a>
+<a id="org77644d3"></a>

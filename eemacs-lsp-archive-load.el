@@ -24,6 +24,9 @@
 ;; #+END_EXAMPLE
 ;;
 ;; * Commentary:
+;; :PROPERTIES:
+;; :CUSTOM_ID: h-b5013db2-37a9-44de-9327-05b17e760dbc
+;; :END:
 
 ;; This project archived all [[https://github.com/c0001/entropy-emacs.git][entropy-emacs]] required Microsoft Language
 ;; Server implementations, and aimed for build and load all of them for
@@ -50,6 +53,31 @@
 ;; Or add to this project root to your =load-path= and ~require~ it or
 ;; using config loader management like =use-package= to deferred load the
 ;; feature =eemacs-lsp-archive-load=.
+
+;; *Environment variables:*
+
+;; We made the make procedure can be specified for particular
+;; platform and architecture even for the archive using type, for
+;; testing or other special meanings. The following three environment
+;; variables were builtin for the sake of thus:
+
+;; 1) =Eemacs_Lspa_Use_Archive=:
+
+;;    The environment variable for indicate whether focely using
+;;    archive type.
+
+;;    Valid value are: 't' or 'nil'
+
+;; 2) =Eemacs_Lspa_Use_Platform=:
+
+;;    The environment variable for indicating which system platform to
+;;    use, valid values are all of them can be getted by emacs
+;;    internal variable =system-type=.
+
+;; 3) =Eemacs_Lspa_Use_Architecture=
+
+;;    The environment variable for indicating which architecture to
+;;    use, valid values are 'x86_64' and 'aarch64'.
 
 ;; ** Contribute
 ;; :PROPERTIES:
@@ -306,20 +334,14 @@
 
 ;; **** optional env condition detected
 
-(defvar eemacs-lspa/project-force-use-archive nil)
-(defvar eemacs-lspa/project-use-specific-architecture nil)
-(defvar eemacs-lspa/project-use-specific-platform nil)
 (defun eemacs-lspa/project-catch-env-var (type)
   (cl-case type
     (force-use-archive-p
-     (or (string= (getenv "Eemacs_Lspa_Use_Archive") "t")
-         eemacs-lspa/project-force-use-archive))
+     (string= (getenv "Eemacs_Lspa_Use_Archive") "t"))
     (use-arch
-     (or (getenv "Eemacs_Lspa_Use_Architecture")
-         eemacs-lspa/project-use-specific-architecture))
+     (getenv "Eemacs_Lspa_Use_Architecture"))
     (use-platform
      (or (ignore-errors (intern (getenv "Eemacs_Lspa_Use_Platform")))
-         eemacs-lspa/project-use-specific-platform
          system-type))
     (t
      (error "Unsupport type '%s'" type))))
@@ -402,7 +424,7 @@
 (defvar eemacs-lspa/project-loaders-missing nil)
 
 
-(let ((exec-requests '("pip" "npm" "bash"))
+(let ((exec-requests '("pip" "npm"))
       (cnt 0))
   (dolist (exec exec-requests)
     (unless (executable-find exec)

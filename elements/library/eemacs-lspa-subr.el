@@ -189,7 +189,7 @@ type:
 
 (defun eemacs-lspa/subr-add-batch-file (item-prompt cmd)
   (with-current-buffer
-      (find-file-noselect eemacs-lspa/subr-shell-batch-file)
+      (find-file-noselect eemacs-lspa/subr-shell-batch-file nil t)
     (let* ((inhibit-read-only t)
            (head-fmstr
             "

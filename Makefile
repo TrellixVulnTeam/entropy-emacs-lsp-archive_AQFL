@@ -63,6 +63,12 @@ define DoExtra =
 endef
 endif
 
+ifeq ($(Eemacs_Lspa_Use_Platform),windows-nt)
+define DoExtra =
+	cmd /c if exist elements/library/eemacs-lspa-install.cmd (call elements/library/eemacs-lspa-install.cmd)
+endef
+endif
+
 # ** rules
 help:
 	@echo ------------------------------------------------------------
