@@ -40,6 +40,21 @@
 ;; more, only operation system included in =Windows= and =gnu/linux= were
 ;; supported as so.
 
+;; #+begin_quote
+;; *Notice for make on windows platform:*
+
+;; If you using Cygwin like posix emulator to make this project,
+;; please confirm that all the kits used by this project's required
+;; are all built by its toolchain, include =python=, =emacs=,
+;; =make=, so that we can guarantee the 'make' environment keep
+;; consistency.
+
+;; Or you should using purely windows individual gnumake to build as
+;; well. You can get windows version of 'gnumake' by any populate
+;; windows packages manager like [[https://chocolatey.org/][chocolate]], and ensure that the
+;; 'make' version equal or larger than 4.3.
+;; #+end_quote
+
 ;; *load:*
 
 ;; The project was designed as the extension for GNU/emacs above(and
@@ -261,7 +276,7 @@
 ;; *** library
 ;; **** Loader expand
 ;; ***** Prebuilt
-(defun eemacs-lspa/project-expand-loader-for-prebuilt-individual (elroot platform arch loader-name)
+(defun eemacs-lspa/project-expand-loader-for-prebuilt-individual (recipe-host-root platform arch loader-name)
   (let ((pltfname (car (alist-get platform eemacs-lspa/project-platform-folder-alias)))
         (archfname (car (alist-get arch eemacs-lspa/project-arch-folder-alias))))
     (expand-file-name
@@ -270,18 +285,18 @@
       archfname
       (expand-file-name
        pltfname
-       (expand-file-name "PreBuilt" (expand-file-name elroot)))))))
+       (expand-file-name "PreBuilt" (expand-file-name recipe-host-root)))))))
 
-(defun eemacs-lspa/project-expand-loader-for-prebuilt-all (elroot loader-name)
+(defun eemacs-lspa/project-expand-loader-for-prebuilt-all (recipe-host-root loader-name)
   (expand-file-name
    loader-name
    (expand-file-name
     "All"
     (expand-file-name
-     "PreBuilt" (expand-file-name elroot)))))
+     "PreBuilt" (expand-file-name recipe-host-root)))))
 
 ;; ***** Archive
-(defun eemacs-lspa/project-expand-loader-for-archive-individual (elroot platform arch loader-name)
+(defun eemacs-lspa/project-expand-loader-for-archive-individual (recipe-host-root platform arch loader-name)
   (let ((pltfname (car (alist-get platform eemacs-lspa/project-platform-folder-alias)))
         (archfname (car (alist-get arch eemacs-lspa/project-arch-folder-alias))))
     (expand-file-name
@@ -290,15 +305,15 @@
       archfname
       (expand-file-name
        pltfname
-       (expand-file-name "Archive" (expand-file-name elroot)))))))
+       (expand-file-name "Archive" (expand-file-name recipe-host-root)))))))
 
-(defun eemacs-lspa/project-expand-loader-for-archive-all (elroot loader-name)
+(defun eemacs-lspa/project-expand-loader-for-archive-all (recipe-host-root loader-name)
   (expand-file-name
    loader-name
    (expand-file-name
     "All"
     (expand-file-name
-     "Archive" (expand-file-name elroot)))))
+     "Archive" (expand-file-name recipe-host-root)))))
 
 
 ;; **** get system architecture
@@ -339,7 +354,7 @@
     (force-use-archive-p
      (string= (getenv "Eemacs_Lspa_Use_Archive") "t"))
     (use-arch
-     (getenv "Eemacs_Lspa_Use_Architecture"))
+     (ignore-errors (intern (getenv "Eemacs_Lspa_Use_Architecture"))))
     (use-platform
      (or (ignore-errors (intern (getenv "Eemacs_Lspa_Use_Platform")))
          system-type))
