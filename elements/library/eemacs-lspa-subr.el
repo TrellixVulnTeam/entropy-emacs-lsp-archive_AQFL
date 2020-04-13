@@ -319,7 +319,7 @@ type:
                                    "systeminfo | findstr /R \"System.Type\"")
                                   ":" t))
                             " " t)))
-                (car (alist-get sysinfo eemacs-lspa/subr--arch-alias))))
+                (car (alist-get sysinfo eemacs-lspa/subr--arch-alias nil nil 'string=))))
              (t
               (intern (replace-regexp-in-string
                        "\n" ""
