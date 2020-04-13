@@ -1,19 +1,21 @@
-Note: this file is auto converted from lisp-toggle-file.[20200413121100].el by [el2org](https://github.com/tumashu/el2org), please do not edit it by hand!!!
+Note: this file is auto converted from lisp-toggle-file.[20200413193854].el by [el2org](https://github.com/tumashu/el2org), please do not edit it by hand!!!
 
-- [eemacs lsp archive project](#org0ccca11)
-- [Copyright (C) date  author](#org42b2420)
+- [eemacs lsp archive project](#org5606d73)
+- [Copyright (C) date  author](#orga23244d)
 - [Commentary:](#h-b5013db2-37a9-44de-9327-05b17e760dbc)
   - [Contribute](#h-8c8344df-e341-4183-9e06-cec26bd8bb43)
     - [`lspa-register` sub-folder naming convention](#h-58d05c1a-62a2-44c4-be4f-1de662fe190b)
     - [Make and load prior](#h-7f5311d9-9ff0-4cb4-96f0-8775fd135246)
     - [Recipes](#h-8960a582-196b-44d4-ad49-bbf74cc943d6)
+    - [Get APIs](#org9e77ace)
 
-<a id="org0ccca11"></a>
+
+<a id="org5606d73"></a>
 
 # eemacs lsp archive project
 
 
-<a id="org42b2420"></a>
+<a id="orga23244d"></a>
 
 # Copyright (C) date  author
 
@@ -120,8 +122,8 @@ For building one `lspa-register` instance, the root of the archive should (but n
 
 The important naming convention are those platform and architecture sub-folders under those second hierarchy folder:
 
--   **For platform:** see the alist of `eemacs-lspa/subr-platform-folder-alias`
--   **For architecture:** see the alist of `eemacs-lspa/subr-arch-folder-alias`
+-   **For platform:** see the alist of `eemacs-lspa/subr-platform-folder-alist`
+-   **For architecture:** see the alist of `eemacs-lspa/subr-architecture-folder-alist`
 
 Thus for a expample, we made a python-language-server `lspa-register` instance:
 
@@ -170,4 +172,11 @@ Thus for a expample, we made a python-language-server `lspa-register` recipe ins
 As see the sample, we use the abbreviation path for the archvie root, which will be automatically expanding with `eemacs-lspa/path-lspa-repos-root`.
 
 
-<a id="org999e942"></a>
+<a id="org9e77ace"></a>
+
+### Get APIs
+
+To all the contributors for writting their own recipes, we recommend to use the project built-in APIs for keeping consistency and obeying the project conventions. All the APIs are hosted on `elements/library/*.el`, read their commentrary for details.
+
+
+<a id="org241da28"></a>

@@ -1,7 +1,8 @@
 # * code
 # ** pre
-# SHELL := /bin/bash
-DOIT=emacs -q --batch -l ./eemacs-lsp-archive-load.el
+EMACS ?= emacs
+
+DOIT := $(EMACS) -q --batch -l ./eemacs-lsp-archive-load.el
 
 # ** os detecting
 # OS detected method obtained by https://stackoverflow.com/questions/714100/os-detecting-makefile
@@ -39,27 +40,13 @@ endif
 
 
 # ** defines
-ifeq ($(detected_OS),Linux)
-define DoExtra =
-	bash -c "if [[ -f elements/library/eemacs-lspa-install.sh ]];then cd elements/library && bash eemacs-lspa-install.sh;fi"
-endef
-endif
-
-ifeq ($(detected_OS),Msys)
-define DoExtra =
-	bash -c "if [[ -f elements/library/eemacs-lspa-install.sh ]];then cd elements/library && bash eemacs-lspa-install.sh;fi"
-endef
-endif
-
-ifeq ($(detected_OS),Cygwin)
-define DoExtra =
-	bash -c "if [[ -f elements/library/eemacs-lspa-install.sh ]];then cd elements/library && bash eemacs-lspa-install.sh;fi"
-endef
-endif
-
 ifeq ($(detected_OS),Windows)
 define DoExtra =
 	cmd /c if exist elements/library/eemacs-lspa-install.cmd (call elements/library/eemacs-lspa-install.cmd)
+endef
+else
+define DoExtra =
+	bash -c "if [[ -f elements/library/eemacs-lspa-install.sh ]];then cd elements/library && bash eemacs-lspa-install.sh;fi"
 endef
 endif
 
@@ -71,28 +58,34 @@ endif
 
 # ** rules
 help:
-	@echo ------------------------------------------------------------
-	@echo   welcom to entropy emacs language server archive project
-	@echo ------------------------------------------------------------
-	@echo
-	@echo This project require GNU/Make version larger than 4.0, if not, will messing your result
-	@echo
-	@echo MAKE options:
-	@echo
-	@echo - help: show this prompt buffer
-	@echo
-	@echo - all: generate language server executes according to current platform
+	$(info ------------------------------------------------------------)
+	$(info   welcom to entropy emacs language server archive project)
+	$(info ------------------------------------------------------------)
+	$(info )
+	$(info This project require GNU/Make version larger than 4.0, if not, will messing your result)
+	$(info )
+	$(info MAKE options:)
+	$(info )
+	$(info - help: show this prompt buffer)
+	$(info )
+	$(info - all: generate language server executes according to current platform)
+	$(info )
+
+emacs_version:
+	@$(EMACS) --version
+
+clean:	emacs_version
+	$(info )
+	@$(EMACS) -q --batch -l clean-root.el
 
 
 ifeq ($(detected_OS),Unknown)
-all:
-	@echo Unknow platform! Abort!
+all:	clean
+	$(info Unknow platform! Abort!)
 
 else
-all:
-	@echo Make on $(detected_OS) ...
-	@echo
-	@git clean -xfd .
+all:    clean
+	$(info Make on $(detected_OS) ...)
 	@$(DOIT)
 	@$(value DoExtra)
 	@touch init

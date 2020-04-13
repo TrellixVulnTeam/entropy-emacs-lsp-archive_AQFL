@@ -165,8 +165,8 @@
 ;; The important naming convention are those platform and
 ;; architecture sub-folders under those second hierarchy folder:
 
-;; - For platform :: see the alist of =eemacs-lspa/subr-platform-folder-alias=
-;; - For architecture :: see the alist of =eemacs-lspa/subr-arch-folder-alias=
+;; - For platform :: see the alist of =eemacs-lspa/subr-platform-folder-alist=
+;; - For architecture :: see the alist of =eemacs-lspa/subr-architecture-folder-alist=
 
 
 ;; Thus for a expample, we made a python-language-server
@@ -233,6 +233,14 @@
 ;; root, which will be automatically expanding with
 ;; =eemacs-lspa/path-lspa-repos-root=.
 
+;; *** Get APIs
+
+;; To all the contributors for writting their own recipes, we
+;; recommend to use the project built-in APIs for keeping consistency
+;; and obeying the project conventions. All the APIs are hosted on
+;; =elements/library/*.el=, read their commentrary for details.
+
+
 ;; * Code
 
 ;; ** preface
@@ -254,8 +262,8 @@
 ;; **** Loader expand
 ;; ***** Prebuilt
 (defun eemacs-lspa/project-expand-loader-for-prebuilt-individual (recipe-host-root platform arch loader-name)
-  (let ((pltfname (car (alist-get platform eemacs-lspa/subr-platform-folder-alias)))
-        (archfname (car (alist-get arch eemacs-lspa/subr-arch-folder-alias))))
+  (let ((pltfname (eemacs-lspa/subr-get-platform-folder-name platform))
+        (archfname (eemacs-lspa/subr-get-architecture-folder-name arch)))
     (expand-file-name
      loader-name
      (expand-file-name
@@ -274,8 +282,8 @@
 
 ;; ***** Archive
 (defun eemacs-lspa/project-expand-loader-for-archive-individual (recipe-host-root platform arch loader-name)
-  (let ((pltfname (car (alist-get platform eemacs-lspa/subr-platform-folder-alias)))
-        (archfname (car (alist-get arch eemacs-lspa/subr-arch-folder-alias))))
+  (let ((pltfname (eemacs-lspa/subr-get-platform-folder-name platform))
+        (archfname (eemacs-lspa/subr-get-architecture-folder-name arch)))
     (expand-file-name
      loader-name
      (expand-file-name

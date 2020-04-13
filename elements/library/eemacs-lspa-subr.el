@@ -1,42 +1,62 @@
+;;; eemacs-lspa-subr.el --- The core subroutines for eemacs lsp archive project
+;;
+;; * Copyright (C) 20200413  entropy
+;; #+BEGIN_EXAMPLE
+;; Author:        Entropy <bmsac0001@gmail.com>
+;; Maintainer:    Entropy <bmsac001@gmail.com>
+;; Compatibility: GNU Emacs emacs-version;
+;; Package-Requires: ((emacs "24") (cl-lib "0.5"))
+;;
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; #+END_EXAMPLE
+;;
+;; * Commentary:
+
+;; The subroutines for entropy emacs lsp archive.
+
+;; Source code was written with outline context wrapper, please read
+;; the commentrary of each section for catching the mechanism and
+;; viewing the APIs provision.
+
+;; * Configuration:
+
+;; Just load commonly.
+
 ;; * code
 ;; ** requirements
 (require 'cl-lib)
 
-(defvar eemacs-lspa/subr-loader-indicator nil)
+;; ** customized variable
+(defvar eemacs-lspa/subr-loader-indicator nil
+  "When non-nil for forcely indicating using loading branch of
+the project init procedure.")
 
+;; ** internal variable declaration
 (defvar eemacs-lspa/subr--print-count 1)
 
-(defun eemacs-lspa/subr-noninteractive ()
-  (if eemacs-lspa/subr-loader-indicator
-      nil
-    noninteractive))
-
-(defvar eemacs-lspa/subr-root-dir
+(defvar eemacs-lspa/subr--root-dir
   (file-name-directory
    (expand-file-name load-file-name)))
 
-
-;; ** Register
-;; *** alias
-(defvar eemacs-lspa/subr-arch-alias
+(defvar eemacs-lspa/subr--arch-alias
   '(("x64-based" x86_64)
     ("x86_64" x86_64)))
 
-(defvar eemacs-lspa/subr-arch-folder-alias
-  '((x86_64 "x86_64")
-    (aarch64 "aarch64")))
-
-(defvar eemacs-lspa/subr-platform-folder-alias
-  '((gnu/linux "GnuLinux")
-    (gnu "GnuHurd")
-    (gnu/kfreebsd "GnuKfreebsd")
-    (darwin "Darwin")
-    (windows-nt "WindowsNT")
-    (cygwin "cygwin")))
-
-;; ** common library
-;; *** dir and file operation
-;; **** list directory
+;; ** Api
+;; *** Commonly API
+;; **** Dir and file operation
+;; ***** list directory
 (defun eemacs-lspa/subr-list-dir-lite (dir-root)
   "Return directory list with type of whichever file or
 directory."
@@ -121,7 +141,7 @@ directory."
       (setq rtn (append rtn (eemacs-lspa/subr-list-subfiles dir))))
     rtn))
 
-;; **** file name parse
+;; ***** file name parse
 (defun eemacs-lspa/subr-file-path-parser (file-name type)
   "The file-path for 'entropy-emacs, functions for get base-name,
 shrink trail slash, and return the parent(up level) dir.
@@ -153,7 +173,7 @@ type:
        (setq rtn (file-name-directory fname))))
     rtn))
 
-;; *** path register
+;; **** Add lsp server bins to emacs env
 
 (defun eemacs-lspa/subr-add-path
     (shell-reg-path shell-reg-append exec-reg-path exec-reg-append)
@@ -173,7 +193,79 @@ type:
                       `(,exec-reg-path)))
       (add-to-list 'exec-path exec-reg-path))))
 
-;; *** optional env condition detected
+;; **** Interactive session judging
+(defun eemacs-lspa/subr-noninteractive ()
+  (if eemacs-lspa/subr-loader-indicator
+      nil
+    noninteractive))
+
+;; **** Read recipes
+
+(defun eemacs-lspa/subr-read-recipes (recipes-root)
+  (let ((recipes-dir (eemacs-lspa/subr-list-dir-lite recipes-root))
+        recipes
+        rtn)
+    (dolist (node recipes-dir)
+      (when (equal "F" (car node))
+        (push (cdr node) recipes)))
+    (when recipes
+      (dolist (rcp recipes)
+        (let ((buff (find-file-noselect rcp)))
+          (with-current-buffer buff
+            (goto-char (point-min))
+            (push (read buff) rtn)))))
+    rtn))
+
+;; **** Echo make prefix prompt
+(defvar eemacs-lspa/subr-current-make-prefix nil)
+(defun eemacs-lspa/subr-echo-make-prefix ()
+  (let ((info eemacs-lspa/subr-current-make-prefix))
+    (message "")
+    (message "Use-platform:     %s" (plist-get info :cur-platform))
+    (message "Use-architecture: %s" (plist-get info :cur-architecture))
+    (message "Use-archive-type: %s" (plist-get info :cur-archive-use-type))
+    (message "")))
+
+;; *** Folder structer node naming API
+;; **** Folder name conventions
+(defvar eemacs-lspa/subr-architecture-folder-alist
+  '((x86_64 "x86_64")
+    (aarch64 "aarch64")))
+
+(defvar eemacs-lspa/subr-platform-folder-alist
+  '((gnu/linux "GnuLinux")
+    (gnu "GnuHurd")
+    (gnu/kfreebsd "GnuKfreebsd")
+    (darwin "Darwin")
+    (windows-nt "WindowsNT")
+    (cygwin "cygwin")))
+
+;; **** Get archive folder name
+
+(defun eemacs-lspa/subr-get-platform-folder-name (system-platform)
+  (let ((folder-name
+         (car
+          (alist-get
+           system-platform
+           eemacs-lspa/subr-platform-folder-alist))))
+    (unless folder-name
+      (error "Can not find platform folder name for platform '%s'"
+             system-platform))
+    folder-name))
+
+(defun eemacs-lspa/subr-get-architecture-folder-name (system-architecture)
+  (let ((folder-name
+         (car
+          (alist-get
+           system-architecture
+           eemacs-lspa/subr-architecture-folder-alist))))
+    (unless folder-name
+      (error "Can not find architecture folder name for architecture '%s'"
+             system-architecture))
+    folder-name))
+
+;; *** System type get API
+;; **** Optional env condition detected
 
 (defun eemacs-lspa/subr-catch-env-var (type)
   (let ((detect-func (lambda (x) (if (string= x "") nil x))))
@@ -188,7 +280,7 @@ type:
        (error "Unsupport type '%s'" type)))))
 
 
-;; *** system type wrapper
+;; **** System type wrapper
 (defun eemacs-lspa/subr-get-system-type ()
   (let ((rtn
          (or (ignore-errors (intern (eemacs-lspa/subr-catch-env-var 'use-platform)))
@@ -205,7 +297,7 @@ type:
       (error "Unrecognize system platform type '%s'" rtn))
     rtn))
 
-;; *** get system architecture
+;; **** Get system architecture
 
 (defun eemacs-lspa/subr-judge-architecture-validp (system-arch)
   (unless (member system-arch '(x86_64 aarch64))
@@ -227,7 +319,7 @@ type:
                                    "systeminfo | findstr /R \"System.Type\"")
                                   ":" t))
                             " " t)))
-                (car (alist-get sysinfo eemacs-lspa/subr-arch-alias))))
+                (car (alist-get sysinfo eemacs-lspa/subr--arch-alias))))
              (t
               (intern (replace-regexp-in-string
                        "\n" ""
@@ -235,7 +327,8 @@ type:
     (eemacs-lspa/subr-judge-architecture-validp architecture)
     architecture))
 
-;; *** procedure message wrapper
+;; *** Make and Load procedure wrapper
+;; **** Procedure calling wrapper
 
 (cl-defmacro eemacs-lspa/subr-common-do-with-prompt
     (message-make
@@ -261,12 +354,12 @@ type:
        (message ""))
      (cl-incf eemacs-lspa/subr--print-count)))
 
-;; *** Add shell batch
+;; **** Add shell batch
 
 (defvar eemacs-lspa/subr-shell-batch-file
   (expand-file-name (format "eemacs-lspa-install.%s"
                             (if (eq (eemacs-lspa/subr-get-system-type) 'windows-nt) "cmd" "sh"))
-                    eemacs-lspa/subr-root-dir))
+                    eemacs-lspa/subr--root-dir))
 
 (defun eemacs-lspa/subr-add-batch-file (item-prompt cmd)
   (with-current-buffer
@@ -299,19 +392,9 @@ echo ==============================
     (save-buffer)
     (kill-buffer)))
 
-;; *** echo make prefix prompt
-(defvar eemacs-lspa/subr-current-make-prefix nil)
-(defun eemacs-lspa/subr-echo-make-prefix ()
-  (let ((info eemacs-lspa/subr-current-make-prefix))
-    (message "")
-    (message "Use-platform:     %s" (plist-get info :cur-platform))
-    (message "Use-architecture: %s" (plist-get info :cur-architecture))
-    (message "Use-archive-type: %s" (plist-get info :cur-archive-use-type))
-    (message "")))
-
-;; ** lsp callers refactory
-;; *** pypi
-;; **** patch python installed bins for import portable "sys.path"
+;; **** Lsp callers refactory
+;; ***** pypi
+;; ****** patch python installed bins for import portable "sys.path"
 (defun eemacs-lspa/subr-pypi-patch-python-bin-for-pythonpath (pyfile site-packages-path)
   (unless (file-exists-p pyfile)
     (error "Pyfile '%s' not existed!" pyfile))
@@ -335,7 +418,7 @@ echo ==============================
       (save-buffer)
       (kill-buffer))))
 
-;; **** generate w32 python installed bins cmd wrapper
+;; ****** generate w32 python installed bins cmd wrapper
 (defun eemacs-lspa/subr-pypi-gen-python-w32-cmd-bin (cmd-bin-file bin-file-abspath site-packages-abspath)
   (let ((template
          "@ECHO off
@@ -366,23 +449,6 @@ EXIT /b
                  (file-name-base bin-file-abspath)))
         (save-buffer)
         (kill-buffer)))))
-
-;; ** read recipes
-
-(defun eemacs-lspa/subr-read-recipes (recipes-root)
-  (let ((recipes-dir (eemacs-lspa/subr-list-dir-lite recipes-root))
-        recipes
-        rtn)
-    (dolist (node recipes-dir)
-      (when (equal "F" (car node))
-        (push (cdr node) recipes)))
-    (when recipes
-      (dolist (rcp recipes)
-        (let ((buff (find-file-noselect rcp)))
-          (with-current-buffer buff
-            (goto-char (point-min))
-            (push (read buff) rtn)))))
-    rtn))
 
 ;; * provide
 (provide 'eemacs-lspa-subr)
