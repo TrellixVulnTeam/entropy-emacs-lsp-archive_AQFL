@@ -165,8 +165,8 @@
 ;; The important naming convention are those platform and
 ;; architecture sub-folders under those second hierarchy folder:
 
-;; - For platform :: see the alist of =eemacs-lspa/project-platform-folder-alias=
-;; - For architecture :: see the alist of =eemacs-lspa/project-arch-folder-alias=
+;; - For platform :: see the alist of =eemacs-lspa/subr-platform-folder-alias=
+;; - For architecture :: see the alist of =eemacs-lspa/subr-arch-folder-alias=
 
 
 ;; Thus for a expample, we made a python-language-server
@@ -249,36 +249,13 @@
 (require 'eemacs-lspa-path)
 (require 'eemacs-lspa-subr)
 
-;; ** Register
-;; *** alias
-(defvar eemacs-lspa/project-arch-alias
-  '(("x64-based" x86_64)
-    ("x86_64" x86_64)))
-
-(defvar eemacs-lspa/project-arch-folder-alias
-  '((x86_64 "x86_64")
-    (aarch64 "aarch64")))
-
-(defvar eemacs-lspa/project-platform-folder-alias
-  '((gnu/linux "GnuLinux")
-    (gnu "GnuHurd")
-    (gnu/kfreebsd "GnuKfreebsd")
-    (darwin "Darwin")
-    (windows-nt "WindowsNT")
-    (cygwin "cygwin")))
-
-;; *** register entries
-(defvar eemacs-lspa/project-lspa-summary
-  (eemacs-lspa/subr-read-recipes
-   eemacs-lspa/path-lspa-recipes-root))
-
 ;; ** Register parse
 ;; *** library
 ;; **** Loader expand
 ;; ***** Prebuilt
 (defun eemacs-lspa/project-expand-loader-for-prebuilt-individual (recipe-host-root platform arch loader-name)
-  (let ((pltfname (car (alist-get platform eemacs-lspa/project-platform-folder-alias)))
-        (archfname (car (alist-get arch eemacs-lspa/project-arch-folder-alias))))
+  (let ((pltfname (car (alist-get platform eemacs-lspa/subr-platform-folder-alias)))
+        (archfname (car (alist-get arch eemacs-lspa/subr-arch-folder-alias))))
     (expand-file-name
      loader-name
      (expand-file-name
@@ -297,8 +274,8 @@
 
 ;; ***** Archive
 (defun eemacs-lspa/project-expand-loader-for-archive-individual (recipe-host-root platform arch loader-name)
-  (let ((pltfname (car (alist-get platform eemacs-lspa/project-platform-folder-alias)))
-        (archfname (car (alist-get arch eemacs-lspa/project-arch-folder-alias))))
+  (let ((pltfname (car (alist-get platform eemacs-lspa/subr-platform-folder-alias)))
+        (archfname (car (alist-get arch eemacs-lspa/subr-arch-folder-alias))))
     (expand-file-name
      loader-name
      (expand-file-name
@@ -315,52 +292,6 @@
     (expand-file-name
      "Archive" (expand-file-name recipe-host-root)))))
 
-
-;; **** get system architecture
-(defun eemacs-lspa/project-get-current-system-architecture (system-platform)
-  (or (eemacs-lspa/project-catch-env-var 'use-arch)
-      (let ((cur-platform system-platform))
-        (cond
-         ((eq cur-platform 'window-nt)
-          (let ((sysinfo))
-            (setq sysinfo
-                  (car (split-string
-                        (nth 1
-                             (split-string
-                              (shell-command-to-string
-                               "systeminfo | findstr /R \"System.Type\"")
-                              ":" t))
-                        " " t)))
-            (car (alist-get sysinfo eemacs-lspa/project-arch-alias))))
-         (t
-          (intern (replace-regexp-in-string
-                   "\n" ""
-                   (shell-command-to-string "uname -m"))))))))
-
-;; **** echo prompt
-(defvar eemacs-lspa/project--current-make-prefix nil)
-(defun eemacs-lspa/project-echo-make-prefix ()
-  (let ((info eemacs-lspa/project--current-make-prefix))
-    (message "")
-    (message "Use-platform:     %s" (plist-get info :cur-platform))
-    (message "Use-architecture: %s" (plist-get info :cur-architecture))
-    (message "Use-archive-type: %s" (plist-get info :cur-archive-use-type))
-    (message "")))
-
-;; **** optional env condition detected
-
-(defun eemacs-lspa/project-catch-env-var (type)
-  (cl-case type
-    (force-use-archive-p
-     (string= (getenv "Eemacs_Lspa_Use_Archive") "t"))
-    (use-arch
-     (ignore-errors (intern (getenv "Eemacs_Lspa_Use_Architecture"))))
-    (use-platform
-     (or (ignore-errors (intern (getenv "Eemacs_Lspa_Use_Platform")))
-         system-type))
-    (t
-     (error "Unsupport type '%s'" type))))
-
 ;; *** main
 
 (defun eemacs-lspa/project-query-register (lspa-register)
@@ -371,15 +302,15 @@
                                           eemacs-lspa/path-lspa-repos-root))
          (prebuilt-obj (plist-get register-tree :prebuilt))
          (archive-obj (plist-get register-tree :archive))
-         (cur-platform (eemacs-lspa/project-catch-env-var 'use-platform))
+         (cur-platform (eemacs-lspa/subr-get-system-type))
          (cur-arch
-          (eemacs-lspa/project-get-current-system-architecture cur-platform)))
+          (eemacs-lspa/subr-get-current-system-architecture)))
 
-    (setq eemacs-lspa/project--current-make-prefix
-          (plist-put eemacs-lspa/project--current-make-prefix
+    (setq eemacs-lspa/subr-current-make-prefix
+          (plist-put eemacs-lspa/subr-current-make-prefix
                      :cur-platform cur-platform))
-    (setq eemacs-lspa/project--current-make-prefix
-          (plist-put eemacs-lspa/project--current-make-prefix
+    (setq eemacs-lspa/subr-current-make-prefix
+          (plist-put eemacs-lspa/subr-current-make-prefix
                      :cur-architecture cur-arch))
 
     (let* (builtin-support
@@ -417,19 +348,19 @@
           (setq archive-support (eemacs-lspa/project-expand-loader-for-archive-individual
                                  register-root cur-platform cur-arch
                                  (plist-get reg-archive-platform-arch :init)))))
-      (cond ((eemacs-lspa/project-catch-env-var 'force-use-archive-p)
-             (setq eemacs-lspa/project--current-make-prefix
-                   (plist-put eemacs-lspa/project--current-make-prefix
+      (cond ((eemacs-lspa/subr-catch-env-var 'force-use-archive-p)
+             (setq eemacs-lspa/subr-current-make-prefix
+                   (plist-put eemacs-lspa/subr-current-make-prefix
                               :cur-archive-use-type "Archive"))
              archive-support)
             (builtin-support
-             (setq eemacs-lspa/project--current-make-prefix
-                   (plist-put eemacs-lspa/project--current-make-prefix
+             (setq eemacs-lspa/subr-current-make-prefix
+                   (plist-put eemacs-lspa/subr-current-make-prefix
                               :cur-archive-use-type "Prebuilt"))
              builtin-support)
             (archive-support
-             (setq eemacs-lspa/project--current-make-prefix
-                   (plist-put eemacs-lspa/project--current-make-prefix
+             (setq eemacs-lspa/subr-current-make-prefix
+                   (plist-put eemacs-lspa/subr-current-make-prefix
                               :cur-archive-use-type "Archive"))
              archive-support)))))
 
@@ -437,7 +368,9 @@
 ;; * provide
 (defvar eemacs-lspa/project-loaders-obtained nil)
 (defvar eemacs-lspa/project-loaders-missing nil)
-
+(defvar eemacs-lspa/project-lspa-summary
+  (eemacs-lspa/subr-read-recipes
+   eemacs-lspa/path-lspa-recipes-root))
 
 (let ((exec-requests '("pip" "npm"))
       (cnt 0))
@@ -457,7 +390,7 @@
     (when (and (not (ignore-errors (file-exists-p loader)))
                (not (null loader)))
       (add-to-list 'eemacs-lspa/project-loaders-missing loader)))
-  (eemacs-lspa/project-echo-make-prefix)
+  (eemacs-lspa/subr-echo-make-prefix)
   (when eemacs-lspa/project-loaders-missing
     (message
      "eemacs lspa registed loader missing,
@@ -471,6 +404,6 @@ please check variable `eemacs-lspa/project-loaders-missing'
            (load loader)))
         ((null eemacs-lspa/project-loaders-obtained)
          (message "There's no available lspa for current architecture '%s'"
-                  system-type))))
+                  (eemacs-lspa/subr-get-system-type)))))
 
 (provide 'eemacs-lsp-archive-load)

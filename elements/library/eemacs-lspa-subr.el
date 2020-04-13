@@ -15,10 +15,24 @@
   (file-name-directory
    (expand-file-name load-file-name)))
 
-(defvar eemacs-lspa/subr-shell-batch-file
-  (expand-file-name (format "eemacs-lspa-install.%s"
-                            (if (eq system-type 'windows-nt) "cmd" "sh"))
-                    eemacs-lspa/subr-root-dir))
+
+;; ** Register
+;; *** alias
+(defvar eemacs-lspa/subr-arch-alias
+  '(("x64-based" x86_64)
+    ("x86_64" x86_64)))
+
+(defvar eemacs-lspa/subr-arch-folder-alias
+  '((x86_64 "x86_64")
+    (aarch64 "aarch64")))
+
+(defvar eemacs-lspa/subr-platform-folder-alias
+  '((gnu/linux "GnuLinux")
+    (gnu "GnuHurd")
+    (gnu/kfreebsd "GnuKfreebsd")
+    (darwin "Darwin")
+    (windows-nt "WindowsNT")
+    (cygwin "cygwin")))
 
 ;; ** common library
 ;; *** dir and file operation
@@ -143,7 +157,7 @@ type:
 
 (defun eemacs-lspa/subr-add-path
     (shell-reg-path shell-reg-append exec-reg-path exec-reg-append)
-  (let ((comma-style (if (eq system-type 'windows-nt) ";" ":")))
+  (let ((comma-style (if (eq (eemacs-lspa/subr-get-system-type) 'windows-nt) ";" ":")))
     (if shell-reg-append
         (setenv "PATH"
                 (concat (getenv "PATH")
@@ -158,6 +172,68 @@ type:
               (append exec-path
                       `(,exec-reg-path)))
       (add-to-list 'exec-path exec-reg-path))))
+
+;; *** optional env condition detected
+
+(defun eemacs-lspa/subr-catch-env-var (type)
+  (let ((detect-func (lambda (x) (if (string= x "") nil x))))
+    (cl-case type
+      (force-use-archive-p
+       (string= (getenv "Eemacs_Lspa_Use_Archive") "t"))
+      (use-arch
+       (funcall detect-func (getenv "Eemacs_Lspa_Use_Architecture")))
+      (use-platform
+       (funcall detect-func (getenv "Eemacs_Lspa_Use_Platform")))
+      (t
+       (error "Unsupport type '%s'" type)))))
+
+
+;; *** system type wrapper
+(defun eemacs-lspa/subr-get-system-type ()
+  (let ((rtn
+         (or (ignore-errors (intern (eemacs-lspa/subr-catch-env-var 'use-platform)))
+             system-type)))
+    (unless (member
+             rtn
+             '(gnu
+               gnu/linux
+               gnu/kfreebsd
+               darwin
+               ms-dos
+               windows-nt
+               cygwin))
+      (error "Unrecognize system platform type '%s'" rtn))
+    rtn))
+
+;; *** get system architecture
+
+(defun eemacs-lspa/subr-judge-architecture-validp (system-arch)
+  (unless (member system-arch '(x86_64 aarch64))
+    (error "Unknow system architecture '%s'!" system-arch)))
+
+(defun eemacs-lspa/subr-get-current-system-architecture ()
+  (let ((system-platform (eemacs-lspa/subr-get-system-type))
+        architecture)
+    (setq architecture
+          (let ((cur-platform system-platform))
+            (cond
+             ((eq cur-platform 'windows-nt)
+              (let ((sysinfo))
+                (setq sysinfo
+                      (car (split-string
+                            (nth 1
+                                 (split-string
+                                  (shell-command-to-string
+                                   "systeminfo | findstr /R \"System.Type\"")
+                                  ":" t))
+                            " " t)))
+                (car (alist-get sysinfo eemacs-lspa/subr-arch-alias))))
+             (t
+              (intern (replace-regexp-in-string
+                       "\n" ""
+                       (shell-command-to-string "uname -m")))))))
+    (eemacs-lspa/subr-judge-architecture-validp architecture)
+    architecture))
 
 ;; *** procedure message wrapper
 
@@ -187,6 +263,11 @@ type:
 
 ;; *** Add shell batch
 
+(defvar eemacs-lspa/subr-shell-batch-file
+  (expand-file-name (format "eemacs-lspa-install.%s"
+                            (if (eq (eemacs-lspa/subr-get-system-type) 'windows-nt) "cmd" "sh"))
+                    eemacs-lspa/subr-root-dir))
+
 (defun eemacs-lspa/subr-add-batch-file (item-prompt cmd)
   (with-current-buffer
       (find-file-noselect eemacs-lspa/subr-shell-batch-file nil t)
@@ -199,7 +280,7 @@ echo [%s]: %s
 echo ==============================
 "
             ))
-      (when (eq system-type 'windows-nt)
+      (when (eq (eemacs-lspa/subr-get-system-type) 'windows-nt)
         (goto-char (point-min))
         (let ((echo-off-not-inserted nil))
           (save-excursion
@@ -217,6 +298,16 @@ echo ==============================
       (newline))
     (save-buffer)
     (kill-buffer)))
+
+;; *** echo make prefix prompt
+(defvar eemacs-lspa/subr-current-make-prefix nil)
+(defun eemacs-lspa/subr-echo-make-prefix ()
+  (let ((info eemacs-lspa/subr-current-make-prefix))
+    (message "")
+    (message "Use-platform:     %s" (plist-get info :cur-platform))
+    (message "Use-architecture: %s" (plist-get info :cur-architecture))
+    (message "Use-archive-type: %s" (plist-get info :cur-archive-use-type))
+    (message "")))
 
 ;; ** lsp callers refactory
 ;; *** pypi
@@ -277,6 +368,7 @@ EXIT /b
         (kill-buffer)))))
 
 ;; ** read recipes
+
 (defun eemacs-lspa/subr-read-recipes (recipes-root)
   (let ((recipes-dir (eemacs-lspa/subr-list-dir-lite recipes-root))
         recipes

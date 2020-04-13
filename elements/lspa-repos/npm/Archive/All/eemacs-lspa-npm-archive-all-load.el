@@ -33,7 +33,7 @@
  :make-body
  ((eemacs-lspa/subr-add-batch-file
    "Installing all node packages"
-   (if (eq system-type 'windows-nt)
+   (if (eq (eemacs-lspa/subr-get-system-type) 'windows-nt)
        (format
         "
 call %s

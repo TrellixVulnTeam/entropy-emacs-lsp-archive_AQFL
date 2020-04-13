@@ -1,20 +1,19 @@
-Note: this file is auto converted from lisp-toggle-file.[20200412192535].el by [el2org](https://github.com/tumashu/el2org), please do not edit it by hand!!!
+Note: this file is auto converted from lisp-toggle-file.[20200413121100].el by [el2org](https://github.com/tumashu/el2org), please do not edit it by hand!!!
 
-- [eemacs lsp archive project](#orgfa9e0e6)
-- [Copyright (C) date  author](#org2bf22fa)
+- [eemacs lsp archive project](#org0ccca11)
+- [Copyright (C) date  author](#org42b2420)
 - [Commentary:](#h-b5013db2-37a9-44de-9327-05b17e760dbc)
   - [Contribute](#h-8c8344df-e341-4183-9e06-cec26bd8bb43)
     - [`lspa-register` sub-folder naming convention](#h-58d05c1a-62a2-44c4-be4f-1de662fe190b)
     - [Make and load prior](#h-7f5311d9-9ff0-4cb4-96f0-8775fd135246)
     - [Recipes](#h-8960a582-196b-44d4-ad49-bbf74cc943d6)
 
-
-<a id="orgfa9e0e6"></a>
+<a id="org0ccca11"></a>
 
 # eemacs lsp archive project
 
 
-<a id="org2bf22fa"></a>
+<a id="org42b2420"></a>
 
 # Copyright (C) date  author
 
@@ -121,8 +120,8 @@ For building one `lspa-register` instance, the root of the archive should (but n
 
 The important naming convention are those platform and architecture sub-folders under those second hierarchy folder:
 
--   **For platform:** see the alist of `eemacs-lspa/project-platform-folder-alias`
--   **For architecture:** see the alist of `eemacs-lspa/project-arch-folder-alias`
+-   **For platform:** see the alist of `eemacs-lspa/subr-platform-folder-alias`
+-   **For architecture:** see the alist of `eemacs-lspa/subr-arch-folder-alias`
 
 Thus for a expample, we made a python-language-server `lspa-register` instance:
 
@@ -171,4 +170,4 @@ Thus for a expample, we made a python-language-server `lspa-register` recipe ins
 As see the sample, we use the abbreviation path for the archvie root, which will be automatically expanding with `eemacs-lspa/path-lspa-repos-root`.
 
 
-<a id="org5ff836e"></a>
+<a id="org999e942"></a>
