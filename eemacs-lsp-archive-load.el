@@ -312,14 +312,12 @@
          (archive-obj (plist-get register-tree :archive))
          (cur-platform (eemacs-lspa/subr-get-system-type))
          (cur-arch
-          (eemacs-lspa/subr-get-current-system-architecture)))
-
-    (setq eemacs-lspa/subr-current-make-prefix
-          (plist-put eemacs-lspa/subr-current-make-prefix
-                     :cur-platform cur-platform))
-    (setq eemacs-lspa/subr-current-make-prefix
-          (plist-put eemacs-lspa/subr-current-make-prefix
-                     :cur-architecture cur-arch))
+          (eemacs-lspa/subr-get-current-system-architecture))
+         (cur-make-prompt
+          (list :recipe-name name
+                :for-platform cur-platform
+                :for-architecture cur-arch))
+         rtn)
 
     (let* (builtin-support
            archive-support
@@ -331,7 +329,6 @@
            (reg-archive-platform (alist-get cur-platform archive-obj))
            (reg-archive-platform-arch (alist-get cur-arch reg-archive-platform))
            reg-archive-use-all)
-
       (catch :exit
         (unless (or (and reg-prebuilt-platform reg-prebuilt-platform-arch)
                     (and reg-prebuilt-all
@@ -356,21 +353,29 @@
           (setq archive-support (eemacs-lspa/project-expand-loader-for-archive-individual
                                  register-root cur-platform cur-arch
                                  (plist-get reg-archive-platform-arch :init)))))
-      (cond ((eemacs-lspa/subr-catch-env-var 'force-use-archive-p)
-             (setq eemacs-lspa/subr-current-make-prefix
-                   (plist-put eemacs-lspa/subr-current-make-prefix
-                              :cur-archive-use-type "Archive"))
-             archive-support)
-            (builtin-support
-             (setq eemacs-lspa/subr-current-make-prefix
-                   (plist-put eemacs-lspa/subr-current-make-prefix
-                              :cur-archive-use-type "Prebuilt"))
-             builtin-support)
-            (archive-support
-             (setq eemacs-lspa/subr-current-make-prefix
-                   (plist-put eemacs-lspa/subr-current-make-prefix
-                              :cur-archive-use-type "Archive"))
-             archive-support)))))
+      (setq rtn
+            (cond ((and (eemacs-lspa/subr-catch-env-var 'force-use-archive-p)
+                        archive-support)
+                   (setq cur-make-prompt
+                         (plist-put cur-make-prompt
+                                    :archive-use-type "Archive"))
+                   archive-support)
+                  (builtin-support
+                   (setq cur-make-prompt
+                         (plist-put cur-make-prompt
+                                    :archive-use-type "Prebuilt"))
+                   builtin-support)
+                  (archive-support
+                   (setq cur-make-prompt
+                         (plist-put cur-make-prompt
+                                    :archive-use-type "Archive"))
+                   archive-support)
+                  (t
+                   (setq cur-make-prompt
+                         (plist-put cur-make-prompt
+                                    :archive-use-type "No match for current system"))))))
+    (push cur-make-prompt eemacs-lspa/subr-current-make-prefix)
+    rtn))
 
 
 ;; * provide
@@ -379,6 +384,9 @@
 (defvar eemacs-lspa/project-lspa-summary
   (eemacs-lspa/subr-read-recipes
    eemacs-lspa/path-lspa-recipes-root))
+(defvar eemacs-lspa/project-log-file
+  (expand-file-name "log.txt"
+                    eemacs-lspa/path-project-root))
 
 (let ((exec-requests '("pip" "npm"))
       (cnt 0))
@@ -398,7 +406,7 @@
     (when (and (not (ignore-errors (file-exists-p loader)))
                (not (null loader)))
       (add-to-list 'eemacs-lspa/project-loaders-missing loader)))
-  (eemacs-lspa/subr-echo-make-prefix)
+  (eemacs-lspa/subr-echo-make-prefix eemacs-lspa/project-log-file)
   (when eemacs-lspa/project-loaders-missing
     (message
      "eemacs lspa registed loader missing,
