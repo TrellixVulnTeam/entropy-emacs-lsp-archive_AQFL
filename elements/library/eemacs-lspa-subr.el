@@ -49,6 +49,10 @@ the project init procedure.")
   (file-name-directory
    (expand-file-name load-file-name)))
 
+(defvar eemacs-lspa/subr--elisp-fmt-py-bin
+  (expand-file-name "elisp-autofmt.py"
+                    eemacs-lspa/subr--root-dir))
+
 (defvar eemacs-lspa/subr--arch-alias
   '(("x64-based" x86_64)
     ("x86_64" x86_64)))
@@ -250,7 +254,8 @@ type:
     (gnu/kfreebsd "GnuKfreebsd")
     (darwin "Darwin")
     (windows-nt "WindowsNT")
-    (cygwin "cygwin")))
+    (cygwin "Cygwin")
+    (all "All")))
 
 ;; **** Get archive folder name
 
@@ -461,6 +466,17 @@ EXIT /b
                  (file-name-base bin-file-abspath)))
         (save-buffer)
         (kill-buffer)))))
+
+;; *** Prettify elisp file
+
+(defun eemacs-lspa/subr-prettify-elisp-file (elisp-file)
+  (message "Prettify elisp file '%s' ..." elisp-file)
+  (shell-command
+   (format "python %s %s"
+           eemacs-lspa/subr--elisp-fmt-py-bin
+           elisp-file))
+  (message "Prettify elisp file '%s' done!" elisp-file))
+
 
 ;; * provide
 (provide 'eemacs-lspa-subr)

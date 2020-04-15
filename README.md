@@ -1,21 +1,20 @@
-Note: this file is auto converted from lisp-toggle-file.[20200413193854].el by [el2org](https://github.com/tumashu/el2org), please do not edit it by hand!!!
+Note: this file is auto converted from lisp-toggle-file.[20200415042427].el by [el2org](https://github.com/tumashu/el2org), please do not edit it by hand!!!
 
-- [eemacs lsp archive project](#org5606d73)
-- [Copyright (C) date  author](#orga23244d)
+- [eemacs lsp archive project](#orgcc68292)
+- [Copyright (C) date  author](#orgecea06a)
 - [Commentary:](#h-b5013db2-37a9-44de-9327-05b17e760dbc)
   - [Contribute](#h-8c8344df-e341-4183-9e06-cec26bd8bb43)
     - [`lspa-register` sub-folder naming convention](#h-58d05c1a-62a2-44c4-be4f-1de662fe190b)
     - [Make and load prior](#h-7f5311d9-9ff0-4cb4-96f0-8775fd135246)
     - [Recipes](#h-8960a582-196b-44d4-ad49-bbf74cc943d6)
-    - [Get APIs](#org9e77ace)
+    - [Get APIs](#org5d81be8)
 
-
-<a id="org5606d73"></a>
+<a id="orgcc68292"></a>
 
 # eemacs lsp archive project
 
 
-<a id="orga23244d"></a>
+<a id="orgecea06a"></a>
 
 # Copyright (C) date  author
 
@@ -156,27 +155,27 @@ So as for the contributor, put your recipe into the `eemacs-lspa/path-lspa-recip
 
 Thus for a expample, we made a python-language-server `lspa-register` recipe instance:
 
-```emacs-lisp
-(python-language-server
- :root
- "python-language-server"
- :prebuilt
- ((gnu/linux
-   (x86_64 :init "eemacs-lspa-pyls-prebuilt-gnulinux-x86_64-load.el")
-   (aarch64 :init "eemacs-lspa-pyls-prebuilt-gnulinux-aarch64-load.el"))
-  (windows-nt
-   (x86_64 :init "eemacs-lspa-pyls-prebuilt-windowsnt-x86_64-load.el")))
- :archive nil)
+``` emacs-lisp
+    (python-language-server
+     :root
+     "python-language-server"
+     :prebuilt
+     ((gnu/linux
+       ((x86_64 :init "eemacs-lspa-pyls-prebuilt-gnulinux-x86_64-load.el")
+        (aarch64 :init "eemacs-lspa-pyls-prebuilt-gnulinux-aarch64-load.el")))
+      (windows-nt
+       ((x86_64 :init "eemacs-lspa-pyls-prebuilt-windowsnt-x86_64-load.el"))))
+     :archive nil)
 ```
 
 As see the sample, we use the abbreviation path for the archvie root, which will be automatically expanding with `eemacs-lspa/path-lspa-repos-root`.
 
 
-<a id="org9e77ace"></a>
+<a id="org5d81be8"></a>
 
 ### Get APIs
 
 To all the contributors for writting their own recipes, we recommend to use the project built-in APIs for keeping consistency and obeying the project conventions. All the APIs are hosted on `elements/library/*.el`, read their commentrary for details.
 
 
-<a id="org241da28"></a>
+<a id="orgf8be515"></a>

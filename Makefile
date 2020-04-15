@@ -66,9 +66,10 @@ help:
 	$(info )
 	$(info MAKE options:)
 	$(info )
-	$(info - help: show this prompt buffer)
+	$(info - help:   show this prompt buffer)
 	$(info )
-	$(info - all: generate language server executes according to current platform)
+	$(info - all:    generate language server executes according to current platform)
+	$(info - create: create a new recipe)
 	$(info )
 
 emacs_version:
@@ -77,6 +78,10 @@ emacs_version:
 clean:	emacs_version
 	$(info )
 	@$(EMACS) -q --batch -l clean-root.el
+
+
+create: clean
+	@$(EMACS) -q --batch -l eemacs-lsp-archive-create-recipe.el
 
 
 ifeq ($(detected_OS),Unknown)

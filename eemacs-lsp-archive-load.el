@@ -217,16 +217,16 @@
 ;; =lspa-register= recipe instance:
 
 ;; #+begin_src emacs-lisp
-;;   (python-language-server
-;;    :root
-;;    "python-language-server"
-;;    :prebuilt
-;;    ((gnu/linux
-;;      (x86_64 :init "eemacs-lspa-pyls-prebuilt-gnulinux-x86_64-load.el")
-;;      (aarch64 :init "eemacs-lspa-pyls-prebuilt-gnulinux-aarch64-load.el"))
-;;     (windows-nt
-;;      (x86_64 :init "eemacs-lspa-pyls-prebuilt-windowsnt-x86_64-load.el")))
-;;    :archive nil)
+;; (python-language-server
+;;  :root
+;;  "python-language-server"
+;;  :prebuilt
+;;  ((gnu/linux
+;;    ((x86_64 :init "eemacs-lspa-pyls-prebuilt-gnulinux-x86_64-load.el")
+;;     (aarch64 :init "eemacs-lspa-pyls-prebuilt-gnulinux-aarch64-load.el")))
+;;   (windows-nt
+;;    ((x86_64 :init "eemacs-lspa-pyls-prebuilt-windowsnt-x86_64-load.el"))))
+;;  :archive nil)
 ;; #+end_src
 
 ;; As see the sample, we use the abbreviation path for the archvie
@@ -239,7 +239,6 @@
 ;; recommend to use the project built-in APIs for keeping consistency
 ;; and obeying the project conventions. All the APIs are hosted on
 ;; =elements/library/*.el=, read their commentrary for details.
-
 
 ;; * Code
 
@@ -276,7 +275,7 @@
   (expand-file-name
    loader-name
    (expand-file-name
-    "All"
+    (eemacs-lspa/subr-get-platform-folder-name 'all)
     (expand-file-name
      "PreBuilt" (expand-file-name recipe-host-root)))))
 
@@ -296,7 +295,7 @@
   (expand-file-name
    loader-name
    (expand-file-name
-    "All"
+    (eemacs-lspa/subr-get-platform-folder-name 'all)
     (expand-file-name
      "Archive" (expand-file-name recipe-host-root)))))
 
@@ -322,11 +321,11 @@
     (let* (builtin-support
            archive-support
            (reg-prebuilt-all (alist-get 'all prebuilt-obj))
-           (reg-prebuilt-platform (alist-get cur-platform prebuilt-obj))
+           (reg-prebuilt-platform (car (alist-get cur-platform prebuilt-obj)))
            (reg-prebuilt-platform-arch (alist-get cur-arch reg-prebuilt-platform))
            reg-prebuilt-use-all
            (reg-archive-all (alist-get 'all archive-obj))
-           (reg-archive-platform (alist-get cur-platform archive-obj))
+           (reg-archive-platform (car (alist-get cur-platform archive-obj)))
            (reg-archive-platform-arch (alist-get cur-arch reg-archive-platform))
            reg-archive-use-all)
       (catch :exit
@@ -396,7 +395,15 @@
         (cl-incf cnt)
         (message "[%s]: missing exec '%s'" cnt exec))))
   (when (> cnt 0)
-    (error "Please install above missing binaries. Abort!")))
+    (error "Please install above missing binaries. Abort!"))
+  (when (version< (replace-regexp-in-string
+                   "\n" ""
+                   (replace-regexp-in-string
+                    "^.+ \\(\\([0-9]\\.?\\)+[0-9]+\\).*"
+                    "\\1"
+                    (shell-command-to-string "python --version")))
+                  "3.8")
+    (error "You must install python version up to 3.8 ")))
 
 (let (rtn)
   (dolist (item eemacs-lspa/project-lspa-summary)
