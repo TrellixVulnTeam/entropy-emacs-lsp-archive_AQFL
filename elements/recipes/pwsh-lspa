@@ -1,0 +1,12 @@
+;; -*- mode: emacs-lisp; -*-
+;;
+;; This is the recipe tempate content for recipe `pwsh-lspa', it gives all
+;; platform archive former which you can choose to enable those you
+;; want and comment the other not be needed.
+;;
+;; * Code
+
+(pwsh-lspa
+  :root "pwsh-lspa"
+  :prebuilt
+  ((all :init "eemacs-lspa-pwsh-lspa-PreBuilt-All-loader.el")))
