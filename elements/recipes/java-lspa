@@ -1,0 +1,12 @@
+;; -*- mode: emacs-lisp; -*-
+;;
+;; This is the recipe tempate content for recipe `java-lspa', it gives all
+;; platform archive former which you can choose to enable those you
+;; want and comment the other not be needed.
+;;
+;; * Code
+
+(java-lspa
+  :root "java-lspa"
+  :prebuilt
+  ((all :init "eemacs-lspa-java-lspa-Prebuilt-All-loader.el"))))
