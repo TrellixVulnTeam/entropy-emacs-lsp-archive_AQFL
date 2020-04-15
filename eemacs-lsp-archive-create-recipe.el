@@ -154,7 +154,7 @@
             (error "Can not use empty recipe name!"))
           (replace-regexp-in-string
            " " "-" input)))
-       (archive-type-list '(("Prebuilt" :prebuilt) ("Archive" :archive)))
+       (archive-type-list '(("PreBuilt" :prebuilt) ("Archive" :archive)))
        (platform-list (mapcar (lambda (x) (list (cadr x) (car x)))
                               eemacs-lspa/subr-platform-folder-alist))
        (architecture-list (mapcar (lambda (x) (list (cadr x) (car x)))
