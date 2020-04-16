@@ -25,9 +25,9 @@
 
 ;; The subroutines for entropy emacs lsp archive.
 
-;; Source code was written with outline context wrapper, please read
-;; the commentrary of each section for catching the mechanism and
-;; viewing the APIs provision.
+;; Source code was written with outline context wrapper, please view
+;; the head entry of each section for rough viewing the API provision
+;; of it and read the context code for more.
 
 ;; * Configuration:
 
