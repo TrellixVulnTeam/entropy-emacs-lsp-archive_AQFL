@@ -69,6 +69,7 @@ help:
 	$(info - help:   show this prompt buffer)
 	$(info )
 	$(info - all:    generate language server executes according to current platform)
+	$(info )
 	$(info - create: create a new recipe)
 	$(info )
 

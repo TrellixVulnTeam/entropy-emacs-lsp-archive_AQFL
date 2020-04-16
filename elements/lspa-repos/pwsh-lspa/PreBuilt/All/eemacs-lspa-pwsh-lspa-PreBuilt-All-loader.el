@@ -12,8 +12,8 @@
 ;; Use `eemacs-lspa/subr-common-do-with-prompt' for export loader
 
 (eemacs-lspa/subr-common-do-with-prompt
- "Init powershell-language-server ..."
- "Add powershell-language-server to path ..."
+ "Init powershell-language-server"
+ "Add powershell-language-server to path"
  :load-body
  ((progn
     (setq lsp-pwsh-dir

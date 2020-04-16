@@ -95,6 +95,7 @@ directory."
       nil)))
 
 (defun eemacs-lspa/subr-list-subfiles (dir-root)
+  "List files under DIR-ROOT"
   (let ((dirlist (eemacs-lspa/subr-list-dir-lite dir-root))
         (rtn nil))
     (if dirlist
@@ -108,6 +109,9 @@ directory."
       nil)))
 
 (defun eemacs-lspa/subr-list-dir-recursively (top-dir)
+  "List subdirs recursively and return a list whose each element
+can be a dir name or a subdir-data, a list whose car was the top
+dir name and the rest was a subdir-data."
   (let ((subdirs (eemacs-lspa/subr-list-subdir top-dir))
         rtn)
     (catch :exit
@@ -121,6 +125,8 @@ directory."
     (reverse rtn)))
 
 (defun eemacs-lspa/subr-list-dir-recursive-for-list (top-dir)
+  "List of all the subdirs under current TOP-DIR, it recursively
+represents. "
   (let ((dir-struct (eemacs-lspa/subr-list-dir-recursively top-dir))
         ext-func)
     (setq
@@ -139,6 +145,7 @@ directory."
     (funcall ext-func dir-struct)))
 
 (defun eemacs-lspa/subr-list-files-recursive-for-list (top-dir)
+  "List of all files under TOP-DIR recursively."
   (let ((dir-list (eemacs-lspa/subr-list-dir-recursive-for-list top-dir))
         rtn)
     (dolist (dir dir-list)
@@ -181,6 +188,11 @@ type:
 
 (defun eemacs-lspa/subr-add-path
     (shell-reg-path shell-reg-append exec-reg-path exec-reg-append)
+  "Add SHELL-REG-PATH to ENV PATH and EXEC-REG-PATH to `exec-path'.
+
+If SHELL-REG-APPEND non-nil appending the SHELL-REGE-PATH to the
+ENV PATH tail. If EXEC-REG-APPEND non-nil, appending
+EXEC-GET-PATH to the tail of `exec-path'."
   (let ((comma-style (if (eq (eemacs-lspa/subr-get-system-type) 'windows-nt) ";" ":")))
     (if shell-reg-append
         (setenv "PATH"
@@ -199,6 +211,9 @@ type:
 
 ;; **** Interactive session judging
 (defun eemacs-lspa/subr-noninteractive ()
+  "Supress non-interactive emacs session `noninteractive' status
+accroding to `eemacs-lspa/subr-loader-indicator' when non-nil,
+otherwise return the value depent on `noninteractive'."
   (if eemacs-lspa/subr-loader-indicator
       nil
     noninteractive))
@@ -246,7 +261,8 @@ type:
 ;; **** Folder name conventions
 (defvar eemacs-lspa/subr-architecture-folder-alist
   '((x86_64 "x86_64")
-    (aarch64 "aarch64")))
+    (aarch64 "aarch64"))
+  "Architecture folder name reflects.")
 
 (defvar eemacs-lspa/subr-platform-folder-alist
   '((gnu/linux "GnuLinux")
@@ -255,7 +271,8 @@ type:
     (darwin "Darwin")
     (windows-nt "WindowsNT")
     (cygwin "Cygwin")
-    (all "All")))
+    (all "All"))
+  "Platform folder name reflects.")
 
 ;; **** Get archive folder name
 
@@ -352,23 +369,27 @@ type:
      message-load
      &key ((:make-body make-body)) ((:load-body load-body))
      &allow-other-keys)
+  "Do make body and load body with specific head prompts.
+
+Ensure that each body must be include in a parentheses."
   `(let ()
      (if (eemacs-lspa/subr-noninteractive)
          (progn
            (message "")
            (message
-            (format "[%s]: %s ..."
+            (format "==================================================\n[%s]: %s ..."
                     eemacs-lspa/subr--print-count
                     ,message-make))
            ,@make-body
            (message ""))
        (message "")
        (message
-        (format "[%s]: %s ..."
+        (format "==================================================\n[%s]: %s ..."
                 eemacs-lspa/subr--print-count
                 ,message-load))
        ,@load-body
        (message ""))
+     (message "Section task done!\n==================================================\n")
      (cl-incf eemacs-lspa/subr--print-count)))
 
 ;; **** Add shell batch
@@ -376,9 +397,13 @@ type:
 (defvar eemacs-lspa/subr-shell-batch-file
   (expand-file-name (format "eemacs-lspa-install.%s"
                             (if (eq (eemacs-lspa/subr-get-system-type) 'windows-nt) "cmd" "sh"))
-                    eemacs-lspa/subr--root-dir))
+                    eemacs-lspa/subr--root-dir)
+  "Shell script file for bootstraping, for posix system using
+bash script, windows use cmd batch, do not support any other script
+language.")
 
 (defun eemacs-lspa/subr-add-batch-file (item-prompt cmd)
+  "Add shell script into `eemacs-lspa/subr-shell-batch-file'."
   (with-current-buffer
       (find-file-noselect eemacs-lspa/subr-shell-batch-file nil t)
     (let* ((inhibit-read-only t)
@@ -413,6 +438,7 @@ echo ==============================
 ;; ***** pypi
 ;; ****** patch python installed bins for import portable "sys.path"
 (defun eemacs-lspa/subr-pypi-patch-python-bin-for-pythonpath (pyfile site-packages-path)
+  "Patch python file PYFILE for add =sys.path= for SITE-PACKAGES-PATH"
   (unless (file-exists-p pyfile)
     (error "Pyfile '%s' not existed!" pyfile))
   (with-current-buffer (find-file-noselect pyfile)
@@ -437,6 +463,8 @@ echo ==============================
 
 ;; ****** generate w32 python installed bins cmd wrapper
 (defun eemacs-lspa/subr-pypi-gen-python-w32-cmd-bin (cmd-bin-file bin-file-abspath site-packages-abspath)
+  "Generate windows cmd batch CMD-BIN-FILE for python callers in
+windows platform and using library path SITE-PAKCAGE-ABSPATH."
   (let ((template
          "@ECHO off
 CALL :find_dp0
@@ -470,6 +498,7 @@ EXIT /b
 ;; *** Prettify elisp file
 
 (defun eemacs-lspa/subr-prettify-elisp-file (elisp-file)
+  "Prettify elisp file."
   (message "Prettify elisp file '%s' ..." elisp-file)
   (shell-command
    (format "python %s %s"

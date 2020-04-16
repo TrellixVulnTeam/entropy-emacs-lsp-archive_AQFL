@@ -12,8 +12,8 @@
 ;; Use `eemacs-lspa/subr-common-do-with-prompt' for export loader
 
 (eemacs-lspa/subr-common-do-with-prompt
- "Init gopls ..."
- "Add gopls to path ..."
+ "Init gopls"
+ "Add gopls to path"
  :load-body
  ((progn
     (eemacs-lspa/subr-add-path

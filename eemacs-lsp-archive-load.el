@@ -163,11 +163,8 @@
 ;; specification.
 
 ;; The important naming convention are those platform and
-;; architecture sub-folders under those second hierarchy folder:
-
-;; - For platform :: see the alist of =eemacs-lspa/subr-platform-folder-alist=
-;; - For architecture :: see the alist of =eemacs-lspa/subr-architecture-folder-alist=
-
+;; architecture sub-folders under those second hierarchy folder, see
+;; the section [[h-cc2e18fd-c581-4861-a1d2-5ee3a26d63c7][Get API]].
 
 ;; Thus for a expample, we made a python-language-server
 ;; =lspa-register= instance:
@@ -233,7 +230,20 @@
 ;; root, which will be automatically expanding with
 ;; =eemacs-lspa/path-lspa-repos-root=.
 
+;; *Create recipe using template:*
+
+;; You can create a recipe template via using ~make create~ by the
+;; project makefile =create= rule, it create recipe for every
+;; architecture of every platform for be as a form, you should
+;; pruning the extra branches that you don't care about. And the
+;; created template is stored in the place as well as the convention
+;; of this project, so that you can directly edit it without any
+;; targets movement.
+
 ;; *** Get APIs
+;; :PROPERTIES:
+;; :CUSTOM_ID: h-cc2e18fd-c581-4861-a1d2-5ee3a26d63c7
+;; :END:
 
 ;; To all the contributors for writting their own recipes, we
 ;; recommend to use the project built-in APIs for keeping consistency
