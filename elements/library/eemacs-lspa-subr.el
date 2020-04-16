@@ -218,45 +218,6 @@ otherwise return the value depent on `noninteractive'."
       nil
     noninteractive))
 
-;; **** Read recipes
-
-(defun eemacs-lspa/subr-read-recipes (recipes-root)
-  (let ((recipes-dir (eemacs-lspa/subr-list-dir-lite recipes-root))
-        recipes
-        rtn)
-    (dolist (node recipes-dir)
-      (when (equal "F" (car node))
-        (push (cdr node) recipes)))
-    (when recipes
-      (dolist (rcp recipes)
-        (let ((buff (find-file-noselect rcp)))
-          (with-current-buffer buff
-            (goto-char (point-min))
-            (push (read buff) rtn)))))
-    rtn))
-
-;; **** Echo make prefix prompt
-(defvar eemacs-lspa/subr-current-make-prefix nil)
-(defun eemacs-lspa/subr-echo-make-prefix (stdout)
-  (let ((info eemacs-lspa/subr-current-make-prefix)
-        (inject-func
-         (lambda (fmt &rest args)
-           (let ((str (apply 'format fmt args)))
-             (message str)
-             (insert (concat str "\n"))))))
-    (dolist (item info)
-      (with-current-buffer (find-file-noselect stdout)
-        (let ((inhibit-read-only t))
-          (funcall inject-func "")
-          (funcall inject-func "==================================================")
-          (funcall inject-func "Use-recipe:       %s" (plist-get item :recipe-name))
-          (funcall inject-func "Use-platform:     %s" (plist-get item :for-platform))
-          (funcall inject-func "Use-architecture: %s" (plist-get item :for-architecture))
-          (funcall inject-func "Use-archive-type: %s" (plist-get item :archive-use-type))
-          (funcall inject-func "==================================================")
-          (funcall inject-func ""))
-        (save-buffer)))))
-
 ;; *** Folder structer node naming API
 ;; **** Folder name conventions
 (defvar eemacs-lspa/subr-architecture-folder-alist

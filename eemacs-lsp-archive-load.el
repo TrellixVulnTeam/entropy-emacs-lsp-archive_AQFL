@@ -309,6 +309,45 @@
     (expand-file-name
      "Archive" (expand-file-name recipe-host-root)))))
 
+;; **** Echo make prefix prompt
+(defvar eemacs-lspa/project-current-make-prefix nil)
+(defun eemacs-lspa/project-echo-make-prefix (stdout)
+  (let ((info eemacs-lspa/project-current-make-prefix)
+        (inject-func
+         (lambda (fmt &rest args)
+           (let ((str (apply 'format fmt args)))
+             (message str)
+             (insert (concat str "\n"))))))
+    (dolist (item info)
+      (with-current-buffer (find-file-noselect stdout)
+        (let ((inhibit-read-only t))
+          (funcall inject-func "")
+          (funcall inject-func "==================================================")
+          (funcall inject-func "Use-recipe:       %s" (plist-get item :recipe-name))
+          (funcall inject-func "Use-platform:     %s" (plist-get item :for-platform))
+          (funcall inject-func "Use-architecture: %s" (plist-get item :for-architecture))
+          (funcall inject-func "Use-archive-type: %s" (plist-get item :archive-use-type))
+          (funcall inject-func "==================================================")
+          (funcall inject-func ""))
+        (save-buffer)))))
+
+;; **** Read recipes
+
+(defun eemacs-lspa/project-read-recipes (recipes-root)
+  (let ((recipes-dir (eemacs-lspa/subr-list-dir-lite recipes-root))
+        recipes
+        rtn)
+    (dolist (node recipes-dir)
+      (when (equal "F" (car node))
+        (push (cdr node) recipes)))
+    (when recipes
+      (dolist (rcp recipes)
+        (let ((buff (find-file-noselect rcp)))
+          (with-current-buffer buff
+            (goto-char (point-min))
+            (push (read buff) rtn)))))
+    rtn))
+
 ;; *** main
 
 (defun eemacs-lspa/project-query-register (lspa-register)
@@ -383,7 +422,7 @@
                    (setq cur-make-prompt
                          (plist-put cur-make-prompt
                                     :archive-use-type "No match for current system"))))))
-    (push cur-make-prompt eemacs-lspa/subr-current-make-prefix)
+    (push cur-make-prompt eemacs-lspa/project-current-make-prefix)
     rtn))
 
 
@@ -391,7 +430,7 @@
 (defvar eemacs-lspa/project-loaders-obtained nil)
 (defvar eemacs-lspa/project-loaders-missing nil)
 (defvar eemacs-lspa/project-lspa-summary
-  (eemacs-lspa/subr-read-recipes
+  (eemacs-lspa/project-read-recipes
    eemacs-lspa/path-lspa-recipes-root))
 (defvar eemacs-lspa/project-log-file
   (expand-file-name "log.txt"
@@ -423,7 +462,7 @@
     (when (and (not (ignore-errors (file-exists-p loader)))
                (not (null loader)))
       (add-to-list 'eemacs-lspa/project-loaders-missing loader)))
-  (eemacs-lspa/subr-echo-make-prefix eemacs-lspa/project-log-file)
+  (eemacs-lspa/project-echo-make-prefix eemacs-lspa/project-log-file)
   (when eemacs-lspa/project-loaders-missing
     (message
      "eemacs lspa registed loader missing,
