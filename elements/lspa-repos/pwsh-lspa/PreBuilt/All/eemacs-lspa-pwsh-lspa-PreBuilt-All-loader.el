@@ -22,7 +22,7 @@
       ;; ensure that the log path exist or will make pwsh-ls start fail
       (let ()
         (unless (file-exists-p lsp-pwsh-log-path)
-          (mkdir lsp-pwsh-log-path 'create-parent))))))
+          (mkdir lsp-pwsh-log-path 'create-parent)))))))
 
 ;; * Provide
 (provide 'eemacs-lspa-pwsh-lspa-PreBuilt-All-loader)
