@@ -1,0 +1,15 @@
+;; -*- mode: emacs-lisp; -*-
+;;
+;; This is the recipe tempate content for recipe `go-lspa', it gives all
+;; platform archive former which you can choose to enable those you
+;; want and comment the other not be needed.
+;;
+;; * Code
+
+(go-lspa
+ :root "go-lspa"
+ :prebuilt
+ ((gnu/linux
+   ((x86_64 :init "eemacs-lspa-go-lspa-PreBuilt-GnuLinux-x86_64-loader.el")))
+  (windows-nt
+   ((x86_64 :init "eemacs-lspa-go-lspa-PreBuilt-WindowsNT-x86_64-loader.el")))))
