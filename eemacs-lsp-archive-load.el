@@ -1,6 +1,6 @@
-;;; eemacs lsp archive project
+;;; eemacs-lsp-archive-load.el --- eemacs lsp archive project
 ;;
-;; * Copyright (C) date  author
+;; * Copyright (C) 2020 Entropy(bmsac0001@gmail.com)
 ;; #+BEGIN_EXAMPLE
 ;; Author:        Entropy <bmsac0001@gmail.com>
 ;; Maintainer:    Entropy <bmsac001@gmail.com>
@@ -164,7 +164,7 @@
 
 ;; The important naming convention are those platform and
 ;; architecture sub-folders under those second hierarchy folder, see
-;; the section [[h-cc2e18fd-c581-4861-a1d2-5ee3a26d63c7][Get API]].
+;; the section [[#h-cc2e18fd-c581-4861-a1d2-5ee3a26d63c7][Get API]].
 
 ;; Thus for a expample, we made a python-language-server
 ;; =lspa-register= instance:
@@ -181,7 +181,7 @@
 ;; #+end_example
 
 ;; For the place hosting each =lspa-register= instance, please see
-;; below sections. ([[h-8960a582-196b-44d4-ad49-bbf74cc943d6][recipe]])
+;; below sections. ([[#h-8960a582-196b-44d4-ad49-bbf74cc943d6][recipe]])
 
 ;; *** Make and load prior
 ;; :PROPERTIES:
