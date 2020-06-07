@@ -60,7 +60,10 @@
                                                         x))
                                        (directory-files file-dir)))))
         (when (null dir-files)
-          (message "Cleanup for rest empty dir: %s" file-dir)
+          (message "Cleanup for rest empty dir: %s"
+                   (replace-regexp-in-string
+                    (regexp-quote eemacs-lspa/clr--call-root)
+                    "" file-dir))
           (delete-directory file-dir))))))
 
 (message "Cleanup done!")
