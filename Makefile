@@ -78,7 +78,7 @@ emacs_version:
 
 clean:	emacs_version
 	$(info )
-	@$(EMACS) -q --batch -l clean-root.el
+	@$(EMACS) -q --batch -l eemacs-lspa-clean-root.el
 
 
 create: clean
