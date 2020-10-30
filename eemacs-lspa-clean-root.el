@@ -22,11 +22,18 @@
            ""
            nil
            (lambda (x)
-             (if (string-match-p
-                  (format "%s%s"
-                          (regexp-quote root-dir)
-                          "\\.git")
-                  x)
+             (if (or (string-match-p    ;whether under top dot-git dir which recognized as a VCS object
+                      (format "%s%s"
+                              (regexp-quote root-dir)
+                              "\\.git")
+                      x)
+                     ;; NOTE: this conditions exist as a weird status
+                     ;; which shouldn't be exist while
+                     ;; `directory-files-recursively' doesn't echo any
+                     ;; './..' node as return, but for windows or
+                     ;; other unwatched environment.
+                     (string-match-p "^\\(\\.\\|\\.\\.\\)$" (file-name-nondirectory x))
+                     )
                  nil
                t)))
           rtn
@@ -54,7 +61,9 @@
          (file-dir (file-name-directory abs-path)))
     (when (file-exists-p abs-path)
       (message "Cleanup for generated file: %s" file)
-      (delete-file abs-path)
+      (if (file-directory-p abs-path)
+          (delete-directory abs-path t)
+        (delete-file abs-path))
       (let ((dir-files (delete nil
                                (mapcar (lambda (x) (and (not (string-match-p "^\\(\\.\\|\\.\\.\\)$" x))
                                                         x))
