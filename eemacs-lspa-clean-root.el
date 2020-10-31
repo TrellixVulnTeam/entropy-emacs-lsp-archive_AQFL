@@ -2,6 +2,11 @@
   (file-name-directory
    (expand-file-name load-file-name)))
 
+(require 'eemacs-lspa-subr
+         (expand-file-name "elements/library/eemacs-lspa-subr.el"
+                           eemacs-lspa/clr--call-root))
+
+
 (defvar eemacs-lspa/clr--hosted-files
   (let ((file (expand-file-name "project-files.txt"
                                 eemacs-lspa/clr--call-root))
@@ -17,7 +22,7 @@
   (let ((root-dir eemacs-lspa/clr--call-root)
         rtn)
     (setq rtn
-          (directory-files-recursively
+          (entropy-lspa/subr-directory-files-recursively
            root-dir
            ""
            nil
