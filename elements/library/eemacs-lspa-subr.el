@@ -55,7 +55,8 @@ the project init procedure.")
 
 (defvar eemacs-lspa/subr--arch-alias
   '(("x64-based" x86_64)
-    ("x86_64" x86_64)))
+    ("x86_64" x86_64)
+    ("AMD64" x86_64)))
 
 ;; ** Api
 ;; *** Commonly API
@@ -307,14 +308,16 @@ otherwise return the value depent on `noninteractive'."
              ((eq cur-platform 'windows-nt)
               (let ((sysinfo))
                 (setq sysinfo
-                      (car (split-string
-                            (nth 1
-                                 (split-string
-                                  (shell-command-to-string
-                                   "systeminfo | findstr /R \"System.Type\"")
-                                  ":" t))
-                            " " t)))
-                (car (alist-get sysinfo eemacs-lspa/subr--arch-alias nil nil 'string=))))
+                      (ignore-errors
+                        (car (split-string
+                              (nth 1
+                                   (split-string
+                                    (shell-command-to-string
+                                     "SET Processor | findstr /R PROCESSOR_ARCHITECTURE")
+                                    "=" t))
+                              "\n" t))))
+                (or (and (null sysinfo) (error "Couldn't obtain system architecture on current WINDOWS platform."))
+                    (car (alist-get sysinfo eemacs-lspa/subr--arch-alias nil nil 'string=)))))
              (t
               (intern (replace-regexp-in-string
                        "\n" ""
